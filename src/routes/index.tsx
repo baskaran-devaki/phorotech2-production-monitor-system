@@ -1,24 +1,80 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { TotalCard } from "@/components/dashboard/TotalCard";
+import { ShiftCard } from "@/components/dashboard/ShiftCard";
+import { HighestCard } from "@/components/dashboard/HighestCard";
+import { TrendChart } from "@/components/dashboard/TrendChart";
+import { useAuthUser, useProductionEntries } from "@/hooks/useProduction";
+import {
+  ALL_SHIFTS, businessDate, currentMonthKey, dailyTotalsForMonth,
+  highestOfMonth, monthKey, monthName, sumLoads,
+} from "@/lib/production";
+import { downloadMonthlyExcel, downloadMonthlyPDF } from "@/lib/pdf-export";
+import { Download, FileSpreadsheet, RefreshCw, Wifi, WifiOff } from "lucide-react";
+import { toast } from "sonner";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  component: Dashboard,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Dashboard() {
+  const { entries, loading, lastUpdated, online } = useProductionEntries();
+  const { user, isAdmin } = useAuthUser();
+  const [tick, setTick] = useState(0);
+
+  const mKey = currentMonthKey();
+  const bDate = businessDate();
+
+  const monthEntries = useMemo(() => entries.filter((e) => monthKey(e.entry_date) === mKey), [entries, mKey, tick]);
+  const monthlyTotal = sumLoads(monthEntries);
+  const highest = useMemo(() => highestOfMonth(entries, mKey), [entries, mKey]);
+  const trend = useMemo(() => dailyTotalsForMonth(entries, mKey), [entries, mKey]);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main className="relative z-10 mx-auto max-w-7xl px-3 sm:px-6 py-4 sm:py-6 space-y-5 sm:space-y-6">
+      <DashboardHeader isAdmin={isAdmin} isSignedIn={!!user} />
+
+      <TotalCard total={monthlyTotal} month={monthName()} />
+
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {ALL_SHIFTS.map((s) => (
+          <ShiftCard key={s} shift={s} entries={entries} businessDate={bDate} />
+        ))}
+      </section>
+
+      <section className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-4">
+        <TrendChart data={trend} />
+        <HighestCard record={highest} />
+      </section>
+
+      <section className="glass-dark rounded-3xl p-4 md:p-5 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3 text-xs text-[color:var(--muted-foreground)]">
+          {online ? <Wifi className="h-4 w-4 text-[color:var(--gold-light)]" /> : <WifiOff className="h-4 w-4 text-destructive" />}
+          <span>{online ? "Live" : "Offline"}</span>
+          <span className="opacity-40">·</span>
+          <span>Updated {lastUpdated.toLocaleTimeString("en-IN")}</span>
+          {loading && <span className="opacity-60">· loading…</span>}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={() => { setTick((n) => n + 1); toast.success("Dashboard refreshed"); }}
+            className="rounded-xl border border-[color:var(--border)] px-3 py-2 text-xs sm:text-sm inline-flex items-center gap-2 hover:bg-[oklch(0.78_0.14_82/10%)] transition">
+            <RefreshCw className="h-4 w-4" /> Refresh
+          </button>
+          <button onClick={() => { downloadMonthlyExcel(entries, mKey); toast.success("Excel downloaded"); }}
+            className="rounded-xl border border-[color:var(--border)] px-3 py-2 text-xs sm:text-sm inline-flex items-center gap-2 hover:bg-[oklch(0.78_0.14_82/10%)] transition">
+            <FileSpreadsheet className="h-4 w-4" /> Excel
+          </button>
+          <button onClick={() => { downloadMonthlyPDF(entries, mKey); toast.success("PDF generated"); }}
+            className="btn-gold rounded-xl px-4 py-2 text-xs sm:text-sm inline-flex items-center gap-2">
+            <Download className="h-4 w-4" /> Download Monthly Report
+          </button>
+        </div>
+      </section>
+
+      <footer className="text-center text-xs text-[color:var(--muted-foreground)] pt-2 pb-6">
+        © {new Date().getFullYear()} Phorotech Surfin India Pvt Ltd · Plant II · ED Plant · Irungattukottai
+      </footer>
+    </main>
   );
 }
