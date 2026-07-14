@@ -23,10 +23,10 @@ export function DashboardHeader({ isAdmin, isSignedIn }: { isAdmin: boolean; isS
               <img src={logoAsset.url} alt="Phorotech Surfin India" className="h-full w-full object-contain" />
             </div>
             <div className="min-w-0">
-              <h1 className="font-[family-name:var(--font-display)] title-text text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-wide">
+              <h1 className="font-[family-name:var(--font-display)] title-text text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-wide">
                 PHOROTECH SURFIN INDIA PVT LTD
               </h1>
-              <p className="mt-2 text-xs sm:text-sm md:text-base text-[color:var(--cyan)] font-medium tracking-[0.25em] uppercase truncate">
+              <p className="mt-2 text-sm sm:text-base md:text-lg text-[color:var(--cyan)] font-bold tracking-[0.25em] uppercase truncate">
                 Plant II · ED Plant · Irungattukottai
               </p>
             </div>
@@ -62,10 +62,11 @@ export function DashboardHeader({ isAdmin, isSignedIn }: { isAdmin: boolean; isS
 
 function Stat({ label, value, sub, pulse, accent }: { label: string; value: string; sub?: string; pulse?: boolean; accent?: boolean }) {
   return (
-    <div className={`glass-dark rounded-2xl p-3 md:p-4 ${pulse ? "gold-glow" : ""}`}>
-      <div className="text-[10px] md:text-xs uppercase tracking-widest text-[color:var(--muted-foreground)]">{label}</div>
-      <div className={`mt-1 font-[family-name:var(--font-mono)] text-lg md:text-2xl truncate ${accent ? "text-[color:var(--cyan)]" : "gold-text"}`}>{value}</div>
-      {sub && <div className="text-[10px] md:text-xs text-[color:var(--muted-foreground)] truncate mt-0.5">{sub}</div>}
+    <div className={`glass-dark rounded-2xl p-4 md:p-5 ${pulse ? "gold-glow" : ""}`}>
+      <div className="text-xs md:text-sm uppercase tracking-widest text-[color:var(--muted-foreground)] font-bold">{label}</div>
+      <div className={`mt-1 font-[family-name:var(--font-mono)] text-xl md:text-3xl font-bold truncate ${accent ? "text-[color:var(--cyan)]" : "gold-text"}`}>{value}</div>
+      {sub && <div className="text-xs md:text-sm text-[color:var(--muted-foreground)] truncate mt-1 font-mono">{sub}</div>}
     </div>
   );
 }
+
