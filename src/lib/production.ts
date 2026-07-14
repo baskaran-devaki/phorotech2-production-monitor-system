@@ -1,5 +1,11 @@
 export type ShiftNum = 1 | 2 | 3;
 
+export const SHIFT_TARGET = 80;
+export const DAILY_TARGET = SHIFT_TARGET * 3;
+export const MONTHLY_TARGET = DAILY_TARGET * 30;
+export const CELEBRATE_THRESHOLD = 200;
+
+
 export interface ProductionEntry {
   id: string;
   entry_date: string; // YYYY-MM-DD
