@@ -10,8 +10,8 @@ export function TrendChart({ data }: { data: Array<{ date: string; loads: number
     <div className="glass-gold rounded-3xl p-5 md:p-6 fade-up">
       <div className="flex items-baseline justify-between mb-4">
         <div>
-          <h3 className="display text-xl md:text-2xl gold-text">Production Trend</h3>
-          <p className="text-xs text-[color:var(--muted-foreground)]">Daily loads · current month</p>
+          <h3 className="font-[family-name:var(--font-display)] text-xl md:text-2xl text-white">Production Trend</h3>
+          <p className="text-xs text-[color:var(--cyan)] uppercase tracking-widest">Daily loads · current month</p>
         </div>
       </div>
       <div className="h-56 md:h-64">

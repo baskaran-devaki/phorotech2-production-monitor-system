@@ -43,7 +43,7 @@ function Dashboard() {
         ))}
       </section>
 
-      <section className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-4">
+      <section className="space-y-4">
         <TrendChart data={trend} />
         <HighestCard record={highest} />
       </section>

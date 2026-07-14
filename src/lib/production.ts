@@ -1,5 +1,11 @@
 export type ShiftNum = 1 | 2 | 3;
 
+export const SHIFT_TARGET = 80;
+export const DAILY_TARGET = SHIFT_TARGET * 3;
+export const MONTHLY_TARGET = DAILY_TARGET * 30;
+export const CELEBRATE_THRESHOLD = 200;
+
+
 export interface ProductionEntry {
   id: string;
   entry_date: string; // YYYY-MM-DD
@@ -116,3 +122,67 @@ export function dailyTotalsForMonth(entries: ProductionEntry[], mKey: string): A
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, loads]) => ({ date, loads }));
 }
+
+export function formatDMY(dateStr: string | null): string {
+  if (!dateStr) return "—";
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return `${pad(d)}-${pad(m)}-${y}`;
+}
+
+/** Returns the last completed hour entry (before "now"): { slot, loads, date, shift } */
+export function lastCompletedHour(
+  entries: ProductionEntry[],
+  now = new Date(),
+): { slot: string; loads: number; date: string; shift: ShiftNum } | null {
+  // Consider entries up to now, pick the one with the greatest (date, shift, slot_index)
+  const bDate = businessDate(now);
+  const candidates = entries.filter((e) => e.entry_date <= bDate);
+  if (!candidates.length) return null;
+  const sorted = [...candidates].sort((a, b) => {
+    if (a.entry_date !== b.entry_date) return a.entry_date < b.entry_date ? 1 : -1;
+    if (a.shift !== b.shift) return b.shift - a.shift;
+    return b.slot_index - a.slot_index;
+  });
+  const e = sorted[0];
+  return { slot: e.time_slot, loads: e.load_count, date: e.entry_date, shift: e.shift };
+}
+
+/** Most recent business day BEFORE today (with any entries) */
+export function lastDayTotal(
+  entries: ProductionEntry[],
+  now = new Date(),
+): { date: string; loads: number } | null {
+  const today = businessDate(now);
+  const byDate = new Map<string, number>();
+  for (const e of entries) {
+    if (e.entry_date >= today) continue;
+    byDate.set(e.entry_date, (byDate.get(e.entry_date) ?? 0) + e.load_count);
+  }
+  if (!byDate.size) return null;
+  const sorted = [...byDate.entries()].sort(([a], [b]) => (a < b ? 1 : -1));
+  return { date: sorted[0][0], loads: sorted[0][1] };
+}
+
+export function previousMonthKey(now = new Date()): string {
+  const d = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+}
+
+export function monthNameFromKey(mKey: string): string {
+  const [y, m] = mKey.split("-").map(Number);
+  return new Date(y, m - 1, 1).toLocaleString("en-IN", { month: "long", year: "numeric" });
+}
+
+export function totalForMonth(entries: ProductionEntry[], mKey: string): number {
+  return entries.filter((e) => monthKey(e.entry_date) === mKey).reduce((s, e) => s + e.load_count, 0);
+}
+
+/** All days in current month with total >= threshold */
+export function celebratedDays(
+  entries: ProductionEntry[],
+  mKey: string,
+  threshold = CELEBRATE_THRESHOLD,
+): Array<{ date: string; loads: number }> {
+  return dailyTotalsForMonth(entries, mKey).filter((d) => d.loads >= threshold);
+}
+
