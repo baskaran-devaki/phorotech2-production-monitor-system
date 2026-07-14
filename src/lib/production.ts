@@ -21,18 +21,45 @@ export interface ProductionEntry {
 export const SHIFTS: Record<ShiftNum, { label: string; range: string; slots: string[] }> = {
   1: {
     label: "Shift I",
-    range: "06:00 AM – 02:00 PM",
-    slots: ["06-07", "07-08", "08-09", "09-10", "10-11", "11-12", "12-01", "01-02"],
+    range: "06:00 AM - 02:00 PM",
+    slots: [
+      "06:00 AM - 07:00 AM",
+      "07:00 AM - 08:00 AM",
+      "08:00 AM - 09:00 AM",
+      "09:00 AM - 10:00 AM",
+      "10:00 AM - 11:00 AM",
+      "11:00 AM - 12:00 PM",
+      "12:00 PM - 01:00 PM",
+      "01:00 PM - 02:00 PM",
+    ],
   },
   2: {
     label: "Shift II",
-    range: "02:00 PM – 10:00 PM",
-    slots: ["02-03", "03-04", "04-05", "05-06", "06-07", "07-08", "08-09", "09-10"],
+    range: "02:00 PM - 10:00 PM",
+    slots: [
+      "02:00 PM - 03:00 PM",
+      "03:00 PM - 04:00 PM",
+      "04:00 PM - 05:00 PM",
+      "05:00 PM - 06:00 PM",
+      "06:00 PM - 07:00 PM",
+      "07:00 PM - 08:00 PM",
+      "08:00 PM - 09:00 PM",
+      "09:00 PM - 10:00 PM",
+    ],
   },
   3: {
     label: "Shift III",
-    range: "10:00 PM – 06:00 AM",
-    slots: ["10-11", "11-12", "12-01", "01-02", "02-03", "03-04", "04-05", "05-06"],
+    range: "10:00 PM - 06:00 AM",
+    slots: [
+      "10:00 PM - 11:00 PM",
+      "11:00 PM - 12:00 AM",
+      "12:00 AM - 01:00 AM",
+      "01:00 AM - 02:00 AM",
+      "02:00 AM - 03:00 AM",
+      "03:00 AM - 04:00 AM",
+      "04:00 AM - 05:00 AM",
+      "05:00 AM - 06:00 AM",
+    ],
   },
 };
 
@@ -144,7 +171,8 @@ export function lastCompletedHour(
     return b.slot_index - a.slot_index;
   });
   const e = sorted[0];
-  return { slot: e.time_slot, loads: e.load_count, date: e.entry_date, shift: e.shift };
+  const slotLabel = SHIFTS[e.shift]?.slots[e.slot_index] ?? e.time_slot;
+  return { slot: slotLabel, loads: e.load_count, date: e.entry_date, shift: e.shift };
 }
 
 /** Most recent business day BEFORE today (with any entries) */
