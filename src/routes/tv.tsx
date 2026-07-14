@@ -240,6 +240,3 @@ function MiniCard({
     </div>
   );
 }
-
-// Suppress unused import warning in strict mode
-void CELEBRATE_THRESHOLD;
