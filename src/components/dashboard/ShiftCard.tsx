@@ -12,17 +12,19 @@ export function ShiftCard({ shift, entries, businessDate }: { shift: ShiftNum; e
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-[color:var(--gold-light)]" />
-            <h3 className="display text-xl md:text-2xl gold-text">{cfg.label}</h3>
+            <Clock className="h-4 w-4 text-[color:var(--cyan)]" />
+            <h3 className="font-[family-name:var(--font-display)] text-xl md:text-2xl text-white">{cfg.label}</h3>
             {isActive && (
-              <span className="text-[10px] uppercase tracking-widest rounded-full bg-[oklch(0.78_0.14_82/25%)] px-2 py-0.5 text-[color:var(--gold-light)] border border-[oklch(0.78_0.14_82/40%)]">Live</span>
+              <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest rounded-full bg-[oklch(0.72_0.19_145/15%)] px-2 py-0.5 text-[color:var(--success)] border border-[color:var(--success)]/40">
+                <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--success)] pulse-green" /> Live
+              </span>
             )}
           </div>
           <p className="text-xs md:text-sm text-[color:var(--muted-foreground)] mt-0.5">{cfg.range}</p>
         </div>
         <div className="text-right shrink-0">
           <div className="text-[10px] uppercase tracking-widest text-[color:var(--muted-foreground)]">Total</div>
-          <div className="display gold-text text-3xl md:text-4xl font-bold">{total}</div>
+          <div className="font-[family-name:var(--font-mono)] gold-text text-3xl md:text-4xl font-bold">{total}</div>
         </div>
       </div>
 
