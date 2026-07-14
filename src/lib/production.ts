@@ -171,7 +171,8 @@ export function lastCompletedHour(
     return b.slot_index - a.slot_index;
   });
   const e = sorted[0];
-  return { slot: e.time_slot, loads: e.load_count, date: e.entry_date, shift: e.shift };
+  const slotLabel = SHIFTS[e.shift]?.slots[e.slot_index] ?? e.time_slot;
+  return { slot: slotLabel, loads: e.load_count, date: e.entry_date, shift: e.shift };
 }
 
 /** Most recent business day BEFORE today (with any entries) */
