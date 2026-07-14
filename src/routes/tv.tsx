@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useProductionEntries } from "@/hooks/useProduction";
 import {
-  ALL_SHIFTS, CELEBRATE_THRESHOLD, DAILY_TARGET, MONTHLY_TARGET, SHIFTS, SHIFT_TARGET,
+  ALL_SHIFTS, DAILY_TARGET, MONTHLY_TARGET, SHIFTS, SHIFT_TARGET,
   businessDate, celebratedDays, currentMonthKey, currentShift, formatDMY,
   highestOfMonth, lastCompletedHour, lastDayTotal, monthName, monthNameFromKey,
   previousMonthKey, sumLoads, totalForMonth,
