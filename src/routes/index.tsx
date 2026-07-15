@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { TotalCard } from "@/components/dashboard/TotalCard";
 import { ShiftCard } from "@/components/dashboard/ShiftCard";
@@ -22,6 +22,10 @@ function Dashboard() {
   const { entries, loading, lastUpdated, online } = useProductionEntries();
   const { user, isAdmin } = useAuthUser();
   const [tick, setTick] = useState(0);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+
 
   const mKey = currentMonthKey();
   const bDate = businessDate();
@@ -48,25 +52,25 @@ function Dashboard() {
         <HighestCard record={highest} />
       </section>
 
-      <section className="glass-dark rounded-3xl p-4 md:p-5 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3 text-xs text-[color:var(--muted-foreground)]">
-          {online ? <Wifi className="h-4 w-4 text-[color:var(--gold-light)]" /> : <WifiOff className="h-4 w-4 text-destructive" />}
-          <span>{online ? "Live" : "Offline"}</span>
+      <section className="glass-dark rounded-3xl p-4 md:p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 min-w-0">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[color:var(--muted-foreground)] min-w-0">
+          {online ? <Wifi className="h-4 w-4 text-[color:var(--gold-light)] shrink-0" /> : <WifiOff className="h-4 w-4 text-destructive shrink-0" />}
+          <span className="font-semibold">{online ? "Live" : "Offline"}</span>
           <span className="opacity-40">·</span>
-          <span>Updated {lastUpdated.toLocaleTimeString("en-IN")}</span>
+          <span className="break-words">Updated {mounted ? lastUpdated.toLocaleTimeString("en-IN") : "—"}</span>
           {loading && <span className="opacity-60">· loading…</span>}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 min-w-0">
           <button onClick={() => { setTick((n) => n + 1); toast.success("Dashboard refreshed"); }}
-            className="rounded-xl border border-[color:var(--border)] px-3 py-2 text-xs sm:text-sm inline-flex items-center gap-2 hover:bg-[oklch(0.78_0.14_82/10%)] transition">
+            className="rounded-xl border border-[color:var(--border)] px-3 py-2 text-xs sm:text-sm inline-flex items-center justify-center gap-2 hover:bg-[oklch(0.78_0.14_82/10%)] transition">
             <RefreshCw className="h-4 w-4" /> Refresh
           </button>
           <button onClick={() => { downloadMonthlyExcel(entries, mKey); toast.success("Excel downloaded"); }}
-            className="rounded-xl border border-[color:var(--border)] px-3 py-2 text-xs sm:text-sm inline-flex items-center gap-2 hover:bg-[oklch(0.78_0.14_82/10%)] transition">
+            className="rounded-xl border border-[color:var(--border)] px-3 py-2 text-xs sm:text-sm inline-flex items-center justify-center gap-2 hover:bg-[oklch(0.78_0.14_82/10%)] transition">
             <FileSpreadsheet className="h-4 w-4" /> Excel
           </button>
           <button onClick={() => { downloadMonthlyPDF(entries, mKey); toast.success("PDF generated"); }}
-            className="btn-gold rounded-xl px-4 py-2 text-xs sm:text-sm inline-flex items-center gap-2">
+            className="btn-gold rounded-xl px-4 py-2 text-xs sm:text-sm inline-flex items-center justify-center gap-2 col-span-2 sm:col-span-1">
             <Download className="h-4 w-4" /> Download Monthly Report
           </button>
         </div>
