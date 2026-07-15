@@ -54,73 +54,90 @@ function TvDisplay() {
   const achColor = (pct: number) =>
     pct >= 90 ? "var(--success)" : pct >= 60 ? "var(--warning)" : "var(--danger)";
 
+  // Fluid sizes — always fit any TV/desktop/laptop/tablet without scrolling.
+  const F = {
+    title: "text-[clamp(14px,1.6vw,28px)]",
+    subtitle: "text-[clamp(10px,1vw,18px)]",
+    clock: "text-[clamp(18px,2.2vw,44px)]",
+    date: "text-[clamp(10px,1vw,18px)]",
+    cardLabel: "text-[clamp(9px,0.85vw,14px)]",
+    cardHead: "text-[clamp(11px,1.05vw,18px)]",
+    hero: "text-[clamp(28px,5.2vw,96px)]",
+    big: "text-[clamp(22px,3.6vw,64px)]",
+    mid: "text-[clamp(18px,2.6vw,44px)]",
+    small: "text-[clamp(14px,1.6vw,26px)]",
+  };
+
   return (
-    <div className="min-h-screen w-full text-white overflow-x-hidden flex flex-col" style={{ background: "#000" }}>
+    <div
+      className="w-screen h-screen overflow-hidden text-white flex flex-col"
+      style={{ background: "#000" }}
+    >
       {/* Header */}
-      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-6 px-6 sm:px-10 pt-6 sm:pt-10 pb-6 sm:pb-8 border-b border-[oklch(0.78_0.14_82/25%)]">
-        <div className="flex items-center gap-4 sm:gap-8 min-w-0">
-          <div className="h-16 w-16 sm:h-24 sm:w-24 shrink-0 rounded-2xl overflow-hidden bg-white p-2">
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-[2vw] py-[1vh] border-b border-[oklch(0.78_0.14_82/25%)] shrink-0">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="h-[6vh] w-[6vh] shrink-0 rounded-xl overflow-hidden bg-white p-1">
             <img src={logoAsset.url} alt="Phorotech" className="h-full w-full object-contain" />
           </div>
           <div className="min-w-0">
-            <h1 className="font-[family-name:var(--font-display)] title-text text-2xl sm:text-4xl lg:text-6xl font-extrabold tracking-wide leading-tight break-words">
+            <h1 className={`font-[family-name:var(--font-display)] title-text font-extrabold tracking-wide leading-tight truncate ${F.title}`}>
               PHOROTECH SURFIN INDIA PVT LTD
             </h1>
-            <p className="mt-1 sm:mt-2 text-sm sm:text-xl lg:text-3xl text-[color:var(--cyan)] tracking-[0.2em] uppercase font-bold break-words">
+            <p className={`text-[color:var(--cyan)] tracking-[0.2em] uppercase font-bold truncate ${F.subtitle}`}>
               Plant II · ED Plant · Irungattukottai
             </p>
           </div>
         </div>
         <div className="text-right shrink-0">
-          <div className="font-[family-name:var(--font-mono)] gold-text text-2xl sm:text-4xl lg:text-6xl font-extrabold">
+          <div className={`font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none ${F.clock}`}>
             {now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true })}
           </div>
-          <div className="mt-1 sm:mt-2 text-xs sm:text-lg lg:text-2xl text-white/85 font-semibold">
+          <div className={`mt-1 text-white/85 font-semibold ${F.date}`}>
             {now.toLocaleDateString("en-IN", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })}
           </div>
         </div>
       </header>
 
       {/* Main */}
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 px-6 sm:px-10 py-6 sm:py-8">
-        {/* Monthly Production - hero */}
-        <div className="lg:col-span-5 glass-gold rounded-3xl p-6 sm:p-10 gold-glow flex flex-col min-w-0">
-          <div className="text-lg sm:text-2xl uppercase tracking-[0.3em] text-[color:var(--cyan)] font-extrabold break-words">
+      <main className="flex-1 min-h-0 grid grid-cols-12 gap-[1.2vw] p-[1.2vw]">
+        {/* Monthly Production - hero (compact, stacked) */}
+        <section className="col-span-12 lg:col-span-5 glass-gold rounded-2xl p-[1.2vw] gold-glow flex flex-col min-w-0 min-h-0 overflow-hidden">
+          <div className={`uppercase tracking-[0.25em] text-[color:var(--cyan)] font-extrabold ${F.cardHead}`}>
             Monthly Production
           </div>
-          <div className="text-2xl sm:text-4xl font-extrabold text-white mt-2 sm:mt-3 font-[family-name:var(--font-display)] uppercase tracking-wider break-words">
+          <div className={`font-extrabold text-white font-[family-name:var(--font-display)] uppercase tracking-wider ${F.mid}`}>
             {monthName(now)}
           </div>
-          <div className="text-sm sm:text-xl uppercase tracking-[0.3em] text-white/70 font-bold mt-2 break-words">
+          <div className={`uppercase tracking-[0.25em] text-white/70 font-bold ${F.cardLabel}`}>
             Total No. of Loads
           </div>
 
-          <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6 min-w-0">
+          <div className="mt-[0.8vh] flex flex-col min-w-0">
             <div className="min-w-0">
-              <div className="text-base sm:text-xl uppercase text-white/70 tracking-widest font-bold">Actual Loads</div>
-              <div className="font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none mt-1 break-words text-[clamp(3.5rem,10vw,9rem)]">
+              <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Actual Loads</div>
+              <div className={`font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none ${F.hero}`}>
                 {monthlyActual.toLocaleString("en-IN")}
               </div>
             </div>
-            <div className="min-w-0">
-              <div className="text-base sm:text-xl uppercase text-white/70 tracking-widest font-bold">Target Loads</div>
-              <div className="font-[family-name:var(--font-mono)] text-white font-extrabold leading-none mt-1 break-words text-[clamp(3.5rem,10vw,9rem)]">
+            <div className="min-w-0 mt-[0.8vh]">
+              <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Target Loads</div>
+              <div className={`font-[family-name:var(--font-mono)] text-white font-extrabold leading-none ${F.big}`}>
                 {MONTHLY_TARGET.toLocaleString("en-IN")}
               </div>
             </div>
           </div>
 
-          <div className="mt-auto pt-6 sm:pt-8">
-            <div className="text-base sm:text-xl uppercase text-white/70 tracking-widest font-bold">Achievement</div>
-            <div className="mt-2 flex items-baseline gap-4 flex-wrap">
+          <div className="mt-auto pt-[0.8vh]">
+            <div className="flex items-baseline justify-between gap-2">
+              <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Achievement</div>
               <span
-                className="font-[family-name:var(--font-mono)] text-5xl sm:text-8xl font-extrabold break-words"
+                className={`font-[family-name:var(--font-mono)] font-extrabold ${F.mid}`}
                 style={{ color: achColor(monthlyAch) }}
               >
                 {monthlyAch.toFixed(2)}%
               </span>
             </div>
-            <div className="mt-4 h-4 sm:h-5 rounded-full bg-white/10 overflow-hidden">
+            <div className="mt-[0.4vh] h-[1.2vh] rounded-full bg-white/10 overflow-hidden">
               <div
                 className="h-full rounded-full transition-all"
                 style={{
@@ -130,41 +147,39 @@ function TvDisplay() {
               />
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Middle column: Total Loads Today + Shift Details */}
-        <div className="lg:col-span-4 flex flex-col gap-6 sm:gap-8 min-w-0">
-          {/* Total Loads Today (Actual / Target only) */}
-          <div className="glass-gold rounded-3xl p-6 sm:p-8 min-w-0">
-            <div className="flex items-center gap-3 mb-3">
-              <span className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-[color:var(--success)] pulse-green" />
-              <span className="text-base sm:text-lg font-extrabold tracking-widest text-[color:var(--success)]">● LIVE</span>
+        <section className="col-span-12 lg:col-span-4 flex flex-col gap-[1.2vw] min-w-0 min-h-0">
+          <div className="glass-gold rounded-2xl p-[1.1vw] min-w-0 overflow-hidden">
+            <div className="flex items-center gap-2 mb-[0.4vh]">
+              <span className="h-[1vh] w-[1vh] rounded-full bg-[color:var(--success)] pulse-green" />
+              <span className={`font-extrabold tracking-widest text-[color:var(--success)] ${F.cardLabel}`}>● LIVE</span>
             </div>
-            <div className="text-lg sm:text-2xl uppercase tracking-[0.3em] text-[color:var(--cyan)] font-extrabold break-words">
+            <div className={`uppercase tracking-[0.25em] text-[color:var(--cyan)] font-extrabold ${F.cardHead}`}>
               Total Loads Today
             </div>
-            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
+            <div className="mt-[0.6vh] grid grid-cols-2 gap-2 min-w-0">
               <div className="min-w-0">
-                <div className="text-sm sm:text-base uppercase text-white/70 tracking-widest font-bold">Actual</div>
-                <div className="font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none mt-1 break-words text-[clamp(3rem,8vw,6rem)]">
+                <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Actual</div>
+                <div className={`font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none ${F.big}`}>
                   {todayActual}
                 </div>
               </div>
               <div className="min-w-0">
-                <div className="text-sm sm:text-base uppercase text-white/70 tracking-widest font-bold">Target</div>
-                <div className="font-[family-name:var(--font-mono)] text-white font-extrabold leading-none mt-1 break-words text-[clamp(3rem,8vw,6rem)]">
+                <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Target</div>
+                <div className={`font-[family-name:var(--font-mono)] text-white font-extrabold leading-none ${F.big}`}>
                   {DAILY_TARGET}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Shift Details */}
-          <div className="glass-gold rounded-3xl p-6 sm:p-8 flex-1 min-w-0">
-            <div className="text-lg sm:text-2xl uppercase tracking-[0.3em] text-[color:var(--cyan)] font-extrabold mb-5 break-words">
+          <div className="glass-gold rounded-2xl p-[1.1vw] flex-1 min-w-0 min-h-0 overflow-hidden flex flex-col">
+            <div className={`uppercase tracking-[0.25em] text-[color:var(--cyan)] font-extrabold mb-[0.6vh] ${F.cardHead}`}>
               Shift Details · Today
             </div>
-            <div className="space-y-4">
+            <div className="flex-1 grid grid-rows-3 gap-[0.6vh] min-h-0">
               {shiftTotals.map(({ shift: s, actual }) => {
                 const active = s === shift;
                 const pct = SHIFT_TARGET > 0 ? (actual / SHIFT_TARGET) * 100 : 0;
@@ -172,32 +187,29 @@ function TvDisplay() {
                 return (
                   <div
                     key={s}
-                    className={`rounded-2xl p-4 sm:p-5 border ${active ? "border-[color:var(--success)]/60 bg-[oklch(0.72_0.19_145/8%)]" : "border-white/10 bg-white/[0.02]"}`}
+                    className={`rounded-xl px-3 py-[0.6vh] border min-h-0 ${active ? "border-[color:var(--success)]/60 bg-[oklch(0.72_0.19_145/8%)]" : "border-white/10 bg-white/[0.02]"}`}
                   >
-                    <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-4 sm:gap-6 min-w-0">
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 min-w-0 h-full">
                       <div className="min-w-0">
-                        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                          {active && <span className="h-3 w-3 rounded-full bg-[color:var(--success)] pulse-green shrink-0" />}
-                          <div className="font-[family-name:var(--font-display)] text-2xl sm:text-4xl font-extrabold text-white break-words">
+                        <div className="flex items-center gap-2">
+                          {active && <span className="h-[0.9vh] w-[0.9vh] rounded-full bg-[color:var(--success)] pulse-green shrink-0" />}
+                          <div className={`font-[family-name:var(--font-display)] font-extrabold text-white truncate ${F.small}`}>
                             {SHIFTS[s].label}
                           </div>
-                          {active && (
-                            <span className="text-xs font-extrabold tracking-widest text-[color:var(--success)]">LIVE</span>
-                          )}
                         </div>
-                        <div className="font-[family-name:var(--font-mono)] text-base sm:text-xl text-white/80 mt-1 break-words">
+                        <div className={`font-[family-name:var(--font-mono)] text-white/80 truncate ${F.cardLabel}`}>
                           {SHIFTS[s].range}
                         </div>
                       </div>
                       <div className="text-right min-w-0">
-                        <div className="text-xs sm:text-sm uppercase text-white/60 font-bold">Actual</div>
-                        <div className="font-[family-name:var(--font-mono)] text-3xl sm:text-4xl font-extrabold break-words" style={{ color }}>
+                        <div className={`uppercase text-white/60 font-bold ${F.cardLabel}`}>Actual</div>
+                        <div className={`font-[family-name:var(--font-mono)] font-extrabold leading-none ${F.mid}`} style={{ color }}>
                           {actual}
                         </div>
                       </div>
                       <div className="text-right min-w-0">
-                        <div className="text-xs sm:text-sm uppercase text-white/60 font-bold">Target</div>
-                        <div className="font-[family-name:var(--font-mono)] text-3xl sm:text-4xl font-extrabold text-white/85 break-words">
+                        <div className={`uppercase text-white/60 font-bold ${F.cardLabel}`}>Target</div>
+                        <div className={`font-[family-name:var(--font-mono)] font-extrabold text-white/85 leading-none ${F.mid}`}>
                           {SHIFT_TARGET}
                         </div>
                       </div>
@@ -207,100 +219,80 @@ function TvDisplay() {
               })}
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Right column: Last Hour + Last Day + Last Month + Highest */}
-        <div className="lg:col-span-3 flex flex-col gap-6 sm:gap-8 min-w-0">
-          <div className="glass-gold rounded-3xl p-6 sm:p-8 cyan-glow min-w-0">
-            <div className="text-base sm:text-xl uppercase tracking-[0.25em] text-[color:var(--cyan)] font-extrabold break-words">
-              Last Hour Production
-            </div>
-            <div className="font-[family-name:var(--font-mono)] text-xl sm:text-2xl text-white font-bold mt-3 break-words">
-              {lastHour?.slot ?? "—"}
-            </div>
-            <div className="mt-6 grid grid-cols-2 gap-3 min-w-0">
-              <div className="min-w-0">
-                <div className="text-xs sm:text-sm uppercase text-white/70 tracking-widest font-bold">Actual</div>
-                <div className="font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none mt-1 break-words text-[clamp(2.5rem,6vw,5rem)]">
-                  {lastHour ? lastHour.loads : "—"}
+        {/* Right column: 4 stacked cards */}
+        <section className="col-span-12 lg:col-span-3 grid grid-rows-4 gap-[1vw] min-w-0 min-h-0">
+          {[
+            {
+              title: "Last Hour Production",
+              sub: lastHour?.slot ?? "—",
+              actual: lastHour ? String(lastHour.loads) : "—",
+              target: "10",
+              glow: "cyan-glow",
+            },
+            {
+              title: "Last Day Production",
+              sub: lastDay ? formatDMY(lastDay.date) : "—",
+              actual: lastDay ? String(lastDay.loads) : "—",
+              target: String(DAILY_TARGET),
+              glow: "",
+            },
+            {
+              title: "Last Month Production",
+              sub: monthNameFromKey(prevMKey),
+              actual: lastMonthActual.toLocaleString("en-IN"),
+              target: MONTHLY_TARGET.toLocaleString("en-IN"),
+              glow: "",
+            },
+            {
+              title: "Highest Production",
+              sub: highest.date ? formatDMY(highest.date) : "—",
+              actual: String(highest.dailyTotal),
+              target: "Loads",
+              glow: "gold-glow",
+              singleValue: true,
+            },
+          ].map((c, i) => (
+            <div key={i} className={`glass-gold rounded-2xl p-[0.9vw] min-w-0 min-h-0 overflow-hidden flex flex-col ${c.glow}`}>
+              <div className={`uppercase tracking-[0.2em] text-[color:var(--cyan)] font-extrabold truncate ${F.cardHead}`}>
+                {c.title}
+              </div>
+              <div className={`font-[family-name:var(--font-mono)] text-white font-bold truncate ${F.small}`}>
+                {c.sub}
+              </div>
+              {c.singleValue ? (
+                <div className="mt-auto">
+                  <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>{c.target}</div>
+                  <div className={`font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none ${F.big}`}>
+                    {c.actual}
+                  </div>
                 </div>
-              </div>
-              <div className="min-w-0">
-                <div className="text-xs sm:text-sm uppercase text-white/70 tracking-widest font-bold">Target</div>
-                <div className="font-[family-name:var(--font-mono)] text-white font-extrabold leading-none mt-1 break-words text-[clamp(2.5rem,6vw,5rem)]">
-                  10
+              ) : (
+                <div className="mt-auto grid grid-cols-2 gap-2 min-w-0">
+                  <div className="min-w-0">
+                    <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Actual</div>
+                    <div className={`font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none ${F.big}`}>
+                      {c.actual}
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Target</div>
+                    <div className={`font-[family-name:var(--font-mono)] text-white font-extrabold leading-none ${F.big}`}>
+                      {c.target}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
-          </div>
-
-          <div className="glass-gold rounded-3xl p-6 sm:p-8 min-w-0">
-            <div className="text-base sm:text-xl uppercase tracking-[0.25em] text-[color:var(--cyan)] font-extrabold break-words">
-              Last Day Production
-            </div>
-            <div className="font-[family-name:var(--font-mono)] text-xl sm:text-2xl text-white font-bold mt-3 break-words">
-              {lastDay ? formatDMY(lastDay.date) : "—"}
-            </div>
-            <div className="mt-6 grid grid-cols-2 gap-3 min-w-0">
-              <div className="min-w-0">
-                <div className="text-xs sm:text-sm uppercase text-white/70 tracking-widest font-bold">Actual</div>
-                <div className="font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none mt-1 break-words text-[clamp(2.5rem,6vw,5rem)]">
-                  {lastDay ? lastDay.loads : "—"}
-                </div>
-              </div>
-              <div className="min-w-0">
-                <div className="text-xs sm:text-sm uppercase text-white/70 tracking-widest font-bold">Target</div>
-                <div className="font-[family-name:var(--font-mono)] text-white font-extrabold leading-none mt-1 break-words text-[clamp(2.5rem,6vw,5rem)]">
-                  {DAILY_TARGET}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-gold rounded-3xl p-6 sm:p-8 min-w-0">
-            <div className="text-base sm:text-xl uppercase tracking-[0.25em] text-[color:var(--cyan)] font-extrabold break-words">
-              Last Month Production
-            </div>
-            <div className="font-[family-name:var(--font-mono)] text-xl sm:text-2xl text-white font-bold mt-3 break-words">
-              {monthNameFromKey(prevMKey)}
-            </div>
-            <div className="mt-6 grid grid-cols-2 gap-3 min-w-0">
-              <div className="min-w-0">
-                <div className="text-xs sm:text-sm uppercase text-white/70 tracking-widest font-bold">Actual</div>
-                <div className="font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none mt-1 break-words text-[clamp(2.25rem,5.5vw,4.5rem)]">
-                  {lastMonthActual.toLocaleString("en-IN")}
-                </div>
-              </div>
-              <div className="min-w-0">
-                <div className="text-xs sm:text-sm uppercase text-white/70 tracking-widest font-bold">Target</div>
-                <div className="font-[family-name:var(--font-mono)] text-white font-extrabold leading-none mt-1 break-words text-[clamp(2.25rem,5.5vw,4.5rem)]">
-                  {MONTHLY_TARGET.toLocaleString("en-IN")}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-gold rounded-3xl p-6 sm:p-8 gold-glow min-w-0">
-            <div className="text-base sm:text-xl uppercase tracking-[0.25em] text-[color:var(--cyan)] font-extrabold break-words">
-              Highest Production
-            </div>
-            <div className="font-[family-name:var(--font-mono)] text-xl sm:text-2xl text-white font-bold mt-3 break-words">
-              {highest.date ? formatDMY(highest.date) : "—"}
-            </div>
-            <div className="mt-6">
-              <div className="text-xs sm:text-sm uppercase text-white/70 tracking-widest font-bold">Loads</div>
-              <div className="font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none mt-1 break-words text-[clamp(2.75rem,6.5vw,5.5rem)]">
-                {highest.dailyTotal}
-              </div>
-            </div>
-          </div>
-        </div>
+          ))}
+        </section>
       </main>
 
       {/* Marquee footer */}
       {celebrate.length > 0 && (
-        <footer className="border-t border-[oklch(0.78_0.14_82/40%)] bg-gradient-to-r from-[#0A0A0A] via-[#1a1300] to-[#0A0A0A] py-4 sm:py-6 overflow-hidden">
-          <div className="marquee-track whitespace-nowrap flex gap-16 font-[family-name:var(--font-display)] text-2xl sm:text-4xl font-extrabold">
+        <footer className="border-t border-[oklch(0.78_0.14_82/40%)] bg-gradient-to-r from-[#0A0A0A] via-[#1a1300] to-[#0A0A0A] py-[0.6vh] overflow-hidden shrink-0">
+          <div className={`marquee-track whitespace-nowrap flex gap-16 font-[family-name:var(--font-display)] font-extrabold ${F.small}`}>
             {[...celebrate, ...celebrate].map((d, i) => (
               <span key={i} className="inline-flex items-center gap-4">
                 <span>🎉</span>
