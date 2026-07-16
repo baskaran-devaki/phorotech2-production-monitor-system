@@ -62,6 +62,8 @@ function TvDisplay() {
     date: "text-[clamp(10px,1vw,18px)]",
     cardLabel: "text-[clamp(9px,0.85vw,14px)]",
     cardHead: "text-[clamp(11px,1.05vw,18px)]",
+    monthHead: "text-[clamp(16px,1.8vw,32px)]",
+    monthHero: "text-[clamp(26px,5.2vw,96px)]",
     hero: "text-[clamp(28px,5.2vw,96px)]",
     big: "text-[clamp(22px,3.6vw,64px)]",
     mid: "text-[clamp(18px,2.6vw,44px)]",
@@ -100,34 +102,33 @@ function TvDisplay() {
 
       {/* Main */}
       <main className="flex-1 min-h-0 grid grid-cols-12 gap-[1.2vw] p-[1.2vw]">
-        {/* Monthly Production - hero (compact, stacked) */}
+        {/* Monthly Production - hero */}
         <section className="col-span-12 lg:col-span-5 glass-gold rounded-2xl p-[1.2vw] gold-glow flex flex-col min-w-0 min-h-0 overflow-hidden">
-          <div className={`uppercase tracking-[0.25em] text-[color:var(--cyan)] font-extrabold ${F.cardHead}`}>
-            Monthly Production
-          </div>
-          <div className={`font-extrabold text-white font-[family-name:var(--font-display)] uppercase tracking-wider ${F.mid}`}>
-            {monthName(now)}
-          </div>
-          <div className={`uppercase tracking-[0.25em] text-white/70 font-bold ${F.cardLabel}`}>
-            Total No. of Loads
+          <div className="text-center shrink-0">
+            <div className={`uppercase tracking-[0.3em] text-[color:var(--cyan)] font-black ${F.monthHead}`}>
+              Monthly Production
+            </div>
+            <div className={`font-black text-white font-[family-name:var(--font-display)] uppercase tracking-wider mt-[0.6vh] ${F.mid}`}>
+              {monthName(now)}
+            </div>
           </div>
 
-          <div className="mt-[0.8vh] flex flex-col min-w-0">
-            <div className="min-w-0">
-              <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Actual Loads</div>
-              <div className={`font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none ${F.hero}`}>
+          <div className="flex-1 min-h-0 grid grid-cols-2 gap-[1vw] mt-[1.2vh]">
+            <div className="rounded-2xl border border-[oklch(0.78_0.14_82/30%)] bg-black/50 flex flex-col items-center justify-center min-w-0 min-h-0 p-[1vw]">
+              <div className={`uppercase text-white/70 tracking-[0.2em] font-bold text-center ${F.cardLabel}`}>Actual Loads</div>
+              <div className={`font-[family-name:var(--font-mono)] gold-text font-black leading-none text-center mt-[0.6vh] ${F.monthHero}`}>
                 {monthlyActual.toLocaleString("en-IN")}
               </div>
             </div>
-            <div className="min-w-0 mt-[0.8vh]">
-              <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Target Loads</div>
-              <div className={`font-[family-name:var(--font-mono)] text-white font-extrabold leading-none ${F.big}`}>
+            <div className="rounded-2xl border border-[oklch(0.78_0.14_82/30%)] bg-black/50 flex flex-col items-center justify-center min-w-0 min-h-0 p-[1vw]">
+              <div className={`uppercase text-white/70 tracking-[0.2em] font-bold text-center ${F.cardLabel}`}>Target Loads</div>
+              <div className={`font-[family-name:var(--font-mono)] text-white font-black leading-none text-center mt-[0.6vh] ${F.monthHero}`}>
                 {MONTHLY_TARGET.toLocaleString("en-IN")}
               </div>
             </div>
           </div>
 
-          <div className="mt-auto pt-[0.8vh]">
+          <div className="mt-[1.2vh] shrink-0">
             <div className="flex items-baseline justify-between gap-2">
               <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Achievement</div>
               <span
