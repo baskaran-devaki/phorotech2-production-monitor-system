@@ -63,7 +63,8 @@ function TvDisplay() {
     cardLabel: "text-[clamp(9px,0.85vw,14px)]",
     cardHead: "text-[clamp(11px,1.05vw,18px)]",
     monthHead: "text-[clamp(16px,1.8vw,32px)]",
-    monthHero: "text-[clamp(26px,5.2vw,96px)]",
+    monthHero: "text-[clamp(32px,7vw,132px)]",
+    achLabel: "text-[clamp(10px,1.05vw,16px)]",
     hero: "text-[clamp(28px,5.2vw,96px)]",
     big: "text-[clamp(22px,3.6vw,64px)]",
     mid: "text-[clamp(18px,2.6vw,44px)]",
@@ -113,14 +114,14 @@ function TvDisplay() {
             </div>
           </div>
 
-          <div className="flex-1 min-h-0 grid grid-cols-2 gap-[1vw] mt-[1.2vh]">
-            <div className="rounded-2xl border border-[oklch(0.78_0.14_82/30%)] bg-black/50 flex flex-col items-center justify-center min-w-0 min-h-0 p-[1vw]">
+          <div className="flex-1 min-h-0 flex flex-col gap-[1vh] mt-[1.2vh]">
+            <div className="flex-1 rounded-2xl border border-[oklch(0.78_0.14_82/30%)] bg-black/50 flex flex-col items-center justify-center min-w-0 min-h-0 p-[1vw]">
               <div className={`uppercase text-white/70 tracking-[0.2em] font-bold text-center ${F.cardLabel}`}>Actual Loads</div>
               <div className={`font-[family-name:var(--font-mono)] gold-text font-black leading-none text-center mt-[0.6vh] ${F.monthHero}`}>
                 {monthlyActual.toLocaleString("en-IN")}
               </div>
             </div>
-            <div className="rounded-2xl border border-[oklch(0.78_0.14_82/30%)] bg-black/50 flex flex-col items-center justify-center min-w-0 min-h-0 p-[1vw]">
+            <div className="flex-1 rounded-2xl border border-[oklch(0.78_0.14_82/30%)] bg-black/50 flex flex-col items-center justify-center min-w-0 min-h-0 p-[1vw]">
               <div className={`uppercase text-white/70 tracking-[0.2em] font-bold text-center ${F.cardLabel}`}>Target Loads</div>
               <div className={`font-[family-name:var(--font-mono)] text-white font-black leading-none text-center mt-[0.6vh] ${F.monthHero}`}>
                 {MONTHLY_TARGET.toLocaleString("en-IN")}
@@ -130,7 +131,7 @@ function TvDisplay() {
 
           <div className="mt-[1.2vh] shrink-0">
             <div className="flex items-baseline justify-between gap-2">
-              <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Achievement</div>
+              <div className={`uppercase text-white/70 tracking-widest font-bold ${F.achLabel}`}>Achievement</div>
               <span
                 className={`font-[family-name:var(--font-mono)] font-extrabold ${F.mid}`}
                 style={{ color: achColor(monthlyAch) }}
