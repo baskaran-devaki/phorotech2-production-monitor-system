@@ -94,10 +94,7 @@ function AuthPage() {
 
           <div className="mt-5 flex flex-col gap-2 text-xs text-center text-[color:var(--muted-foreground)]">
             {mode === "signin" && (
-              <>
-                <button onClick={() => setMode("forgot")} className="hover:text-[color:var(--gold-light)] transition">Forgot password?</button>
-                <button onClick={() => setMode("signup")} className="hover:text-[color:var(--gold-light)] transition">Create the first admin account</button>
-              </>
+              <button onClick={() => setMode("forgot")} className="hover:text-[color:var(--gold-light)] transition">Forgot password?</button>
             )}
             {mode !== "signin" && (
               <button onClick={() => setMode("signin")} className="hover:text-[color:var(--gold-light)] transition">← Back to sign in</button>

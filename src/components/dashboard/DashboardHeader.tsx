@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { SHIFTS, currentShift, monthName } from "@/lib/production";
 import { Link } from "@tanstack/react-router";
-import { LogIn, Shield, Tv } from "lucide-react";
+import { LogIn, Shield, Tv, Crown } from "lucide-react";
 import logoAsset from "@/assets/phorotech-logo.jpg.asset.json";
 
-export function DashboardHeader({ isAdmin, isSignedIn }: { isAdmin: boolean; isSignedIn: boolean }) {
+export function DashboardHeader({ isAdmin, isSignedIn, isSuperAdmin = false }: { isAdmin: boolean; isSignedIn: boolean; isSuperAdmin?: boolean }) {
   const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
     setNow(new Date());
@@ -33,11 +33,18 @@ export function DashboardHeader({ isAdmin, isSignedIn }: { isAdmin: boolean; isS
           </div>
           <div className="flex flex-col items-end gap-2 shrink-0">
             {isSignedIn ? (
-              isAdmin && (
-                <Link to="/admin" className="btn-gold rounded-xl px-3 py-2 text-xs sm:text-sm inline-flex items-center gap-2">
-                  <Shield className="h-4 w-4" /> <span className="hidden sm:inline">Admin Panel</span>
-                </Link>
-              )
+              <>
+                {isSuperAdmin && (
+                  <Link to="/super" className="btn-gold rounded-xl px-3 py-2 text-xs sm:text-sm inline-flex items-center gap-2">
+                    <Crown className="h-4 w-4" /> <span className="hidden sm:inline">Super Admin</span>
+                  </Link>
+                )}
+                {isAdmin && (
+                  <Link to="/admin" className="btn-outline-gold rounded-xl px-3 py-2 text-xs sm:text-sm inline-flex items-center gap-2">
+                    <Shield className="h-4 w-4" /> <span className="hidden sm:inline">Admin Panel</span>
+                  </Link>
+                )}
+              </>
             ) : (
               <Link to="/auth" className="btn-outline-gold rounded-xl px-3 py-2 text-xs sm:text-sm inline-flex items-center gap-2">
                 <LogIn className="h-4 w-4" /> <span className="hidden sm:inline">Admin Login</span>
