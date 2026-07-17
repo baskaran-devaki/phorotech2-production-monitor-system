@@ -20,7 +20,7 @@ export const Route = createFileRoute("/")({
 
 function Dashboard() {
   const { entries, loading, lastUpdated, online } = useProductionEntries();
-  const { user, isAdmin } = useAuthUser();
+  const { user, isAdmin, isSuperAdmin } = useAuthUser();
   const [tick, setTick] = useState(0);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -37,7 +37,7 @@ function Dashboard() {
 
   return (
     <main className="relative z-10 mx-auto max-w-7xl px-3 sm:px-6 py-4 sm:py-6 space-y-5 sm:space-y-6">
-      <DashboardHeader isAdmin={isAdmin} isSignedIn={!!user} />
+      <DashboardHeader isAdmin={isAdmin} isSignedIn={!!user} isSuperAdmin={isSuperAdmin} />
 
       <TotalCard total={monthlyTotal} month={monthName()} />
 
