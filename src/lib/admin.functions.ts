@@ -2,8 +2,9 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
 
-async function assertSuperAdmin(ctx: { supabase: { rpc: (fn: string, args: unknown) => Promise<{ data: unknown; error: unknown }> }; userId: string }) {
-  const { data, error } = await ctx.supabase.rpc("is_super_admin", { _user_id: ctx.userId });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function assertSuperAdmin(context: any) {
+  const { data, error } = await context.supabase.rpc("is_super_admin", { _user_id: context.userId });
   if (error) throw new Error("Authorization check failed");
   if (!data) throw new Error("Forbidden: super admin only");
 }
@@ -11,7 +12,7 @@ async function assertSuperAdmin(ctx: { supabase: { rpc: (fn: string, args: unkno
 async function logAudit(actorId: string, actorEmail: string | null, action: string, entity: string, entityId: string | null, details: Record<string, unknown>) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   await supabaseAdmin.from("audit_logs").insert({
-    actor_id: actorId, actor_email: actorEmail, action, entity, entity_id: entityId, details,
+    actor_id: actorId, actor_email: actorEmail, action, entity, entity_id: entityId, details: details as never,
   });
 }
 
