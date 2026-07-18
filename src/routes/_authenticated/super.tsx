@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/hooks/useProduction";
 import { toast } from "sonner";
-import { ArrowLeft, LogOut, Loader2, ShieldAlert, UserPlus, Ban, Trash2, ShieldCheck, Shield, Save, Crown } from "lucide-react";
+import { ArrowLeft, LogOut, Loader2, ShieldAlert, UserPlus, Ban, Trash2, ShieldCheck, Shield, Save, Crown, Mail, KeyRound, Smartphone, LifeBuoy, Eye, EyeOff, CheckCircle2, AlertTriangle, Lock } from "lucide-react";
 import {
   listAdminUsers, inviteAdmin, setUserDisabled, deleteAdmin, setAdminRole,
 } from "@/lib/admin.functions";
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/super")({
   component: SuperAdminPanel,
 });
 
-type Tab = "admins" | "plant" | "audit";
+type Tab = "admins" | "plant" | "security" | "audit";
 type AdminUser = { id: string; email: string; created_at: string; last_sign_in_at: string | null; banned_until: string | null; roles: string[]; is_super_admin: boolean };
 
 function SuperAdminPanel() {
@@ -54,16 +54,17 @@ function SuperAdminPanel() {
       </header>
 
       <nav className="glass-gold rounded-2xl p-2 flex flex-wrap gap-1">
-        {(["admins", "plant", "audit"] as const).map((k) => (
+        {(["admins", "plant", "security", "audit"] as const).map((k) => (
           <button key={k} onClick={() => setTab(k)}
             className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${tab === k ? "bg-[oklch(0.78_0.14_82/25%)] text-[color:var(--gold-light)]" : "hover:bg-[oklch(0.78_0.14_82/10%)]"}`}>
-            {k === "admins" ? "Admin Accounts" : k === "plant" ? "Plant Head" : "Audit Logs"}
+            {k === "admins" ? "Admin Accounts" : k === "plant" ? "Plant Head" : k === "security" ? "Security" : "Audit Logs"}
           </button>
         ))}
       </nav>
 
       {tab === "admins" && <AdminsTab currentUserId={user!.id} />}
       {tab === "plant" && <PlantHeadTab />}
+      {tab === "security" && <SecurityTab userEmail={user!.email ?? ""} userId={user!.id} />}
       {tab === "audit" && <AuditTab />}
     </main>
   );
@@ -261,6 +262,252 @@ function AuditTab() {
           </tbody>
         </table>
       </div>
+    </section>
+  );
+}
+
+// ---------------- Security Tab ----------------
+
+type SecuritySettings = {
+  user_id: string;
+  two_factor_enabled: boolean;
+  recovery_email: string | null;
+  recovery_email_verified: boolean;
+  pending_new_email: string | null;
+};
+
+function passwordIssues(pw: string): string[] {
+  const issues: string[] = [];
+  if (pw.length < 8) issues.push("At least 8 characters");
+  if (!/[a-z]/.test(pw)) issues.push("One lowercase letter");
+  if (!/[A-Z]/.test(pw)) issues.push("One uppercase letter");
+  if (!/[0-9]/.test(pw)) issues.push("One number");
+  if (!/[^A-Za-z0-9]/.test(pw)) issues.push("One special character");
+  return issues;
+}
+
+function SecurityTab({ userEmail, userId }: { userEmail: string; userId: string }) {
+  const [settings, setSettings] = useState<SecuritySettings | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from("security_settings").select("*").eq("user_id", userId).maybeSingle();
+    if (error) toast.error(error.message);
+    if (data) setSettings(data as SecuritySettings);
+    else setSettings({ user_id: userId, two_factor_enabled: false, recovery_email: null, recovery_email_verified: false, pending_new_email: null });
+    setLoading(false);
+  }, [userId]);
+  useEffect(() => { load(); }, [load]);
+
+  async function upsert(patch: Partial<SecuritySettings>) {
+    const next = { ...(settings ?? { user_id: userId, two_factor_enabled: false, recovery_email: null, recovery_email_verified: false, pending_new_email: null }), ...patch };
+    const { error } = await supabase.from("security_settings").upsert(next, { onConflict: "user_id" });
+    if (error) { toast.error(error.message); return false; }
+    setSettings(next as SecuritySettings);
+    return true;
+  }
+
+  if (loading || !settings) {
+    return <div className="glass-gold rounded-3xl p-8 text-center"><Loader2 className="h-6 w-6 animate-spin inline text-[color:var(--gold)]" /></div>;
+  }
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <ChangeEmailCard currentEmail={userEmail} pending={settings.pending_new_email} onQueued={(e) => upsert({ pending_new_email: e })} onCancel={() => upsert({ pending_new_email: null })} />
+      <ChangePasswordCard />
+      <TwoFactorCard enabled={settings.two_factor_enabled} onToggle={(v) => upsert({ two_factor_enabled: v })} />
+      <RecoveryEmailCard recovery={settings.recovery_email} verified={settings.recovery_email_verified} onSave={(e) => upsert({ recovery_email: e, recovery_email_verified: false })} />
+    </div>
+  );
+}
+
+function OtpNotice() {
+  return (
+    <div className="mt-3 flex gap-2 items-start rounded-xl border border-[oklch(0.78_0.14_82/25%)] bg-[oklch(0.78_0.14_82/8%)] p-3 text-[11px] text-[color:var(--muted-foreground)]">
+      <AlertTriangle className="h-3.5 w-3.5 mt-0.5 text-[color:var(--gold-light)] shrink-0" />
+      <span>Email OTP verification will activate automatically once the email service is connected. Your request is saved and will resume the verification flow then.</span>
+    </div>
+  );
+}
+
+function ChangeEmailCard({ currentEmail, pending, onQueued, onCancel }: { currentEmail: string; pending: string | null; onQueued: (e: string) => Promise<boolean>; onCancel: () => Promise<boolean> }) {
+  const [email, setEmail] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (email.trim().toLowerCase() === currentEmail.toLowerCase()) { toast.error("New email is the same as current"); return; }
+    setBusy(true);
+    const ok = await onQueued(email.trim());
+    setBusy(false);
+    if (ok) { toast.success("Email change request saved (OTP pending)"); setEmail(""); }
+  }
+  return (
+    <section className="glass-gold rounded-3xl p-5 sm:p-6 fade-up">
+      <h3 className="display gold-text text-lg inline-flex items-center gap-2"><Mail className="h-5 w-5" /> Change Login Email</h3>
+      <p className="text-[11px] text-[color:var(--muted-foreground)] mt-1">Requires double OTP verification (current + new address).</p>
+      <div className="mt-4 space-y-1">
+        <div className="text-[10px] uppercase tracking-widest text-[color:var(--gold-light)]">Current</div>
+        <div className="text-sm font-mono">{currentEmail}</div>
+      </div>
+      {pending && (
+        <div className="mt-3 rounded-xl border border-[oklch(0.78_0.14_82/30%)] bg-[oklch(0.20_0.02_80/40%)] p-3 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-[10px] uppercase tracking-widest text-[color:var(--gold-light)]">Pending</div>
+            <div className="text-sm font-mono truncate">{pending}</div>
+          </div>
+          <button onClick={() => onCancel()} className="text-xs rounded-lg px-3 py-1.5 border border-[color:var(--border)] hover:bg-destructive/10 text-destructive">Cancel</button>
+        </div>
+      )}
+      <form onSubmit={submit} className="mt-3 flex flex-wrap items-end gap-2">
+        <label className="flex-1 min-w-[200px]">
+          <div className="text-[10px] uppercase tracking-widest text-[color:var(--gold-light)] mb-1.5">New Email</div>
+          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="new@company.com"
+            className="w-full bg-[oklch(0.14_0.005_60/60%)] border border-[color:var(--border)] rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[color:var(--gold)]" />
+        </label>
+        <button disabled={busy} className="btn-gold rounded-xl px-4 py-2.5 text-sm inline-flex items-center gap-2 disabled:opacity-60">
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Request
+        </button>
+      </form>
+      <OtpNotice />
+    </section>
+  );
+}
+
+function ChangePasswordCard() {
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [show, setShow] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const issues = passwordIssues(next);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (issues.length) { toast.error("Password does not meet requirements"); return; }
+    if (next !== confirm) { toast.error("Passwords do not match"); return; }
+    setBusy(true);
+    try {
+      const { data: u } = await supabase.auth.getUser();
+      const email = u.user?.email;
+      if (!email) throw new Error("No session");
+      const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password: current });
+      if (signInErr) throw new Error("Current password is incorrect");
+      const { error } = await supabase.auth.updateUser({ password: next });
+      if (error) throw error;
+      toast.success("Password updated");
+      setCurrent(""); setNext(""); setConfirm("");
+    } catch (err) { toast.error((err as Error).message); } finally { setBusy(false); }
+  }
+
+  return (
+    <section className="glass-gold rounded-3xl p-5 sm:p-6 fade-up">
+      <h3 className="display gold-text text-lg inline-flex items-center gap-2"><KeyRound className="h-5 w-5" /> Change Password</h3>
+      <p className="text-[11px] text-[color:var(--muted-foreground)] mt-1">Min 8 chars, mixed case, number, special character.</p>
+      <form onSubmit={submit} className="mt-4 space-y-3">
+        {[
+          { label: "Current Password", val: current, set: setCurrent },
+          { label: "New Password", val: next, set: setNext },
+          { label: "Confirm New Password", val: confirm, set: setConfirm },
+        ].map((f) => (
+          <label key={f.label} className="block">
+            <div className="text-[10px] uppercase tracking-widest text-[color:var(--gold-light)] mb-1.5">{f.label}</div>
+            <div className="flex items-center gap-2 rounded-xl border border-[color:var(--border)] bg-[oklch(0.14_0.005_60/60%)] px-3 py-2.5">
+              <Lock className="h-4 w-4 text-[color:var(--muted-foreground)]" />
+              <input type={show ? "text" : "password"} required value={f.val} onChange={(e) => f.set(e.target.value)}
+                className="w-full bg-transparent outline-none text-sm" />
+              {f.label === "New Password" && (
+                <button type="button" onClick={() => setShow(!show)} className="text-[color:var(--muted-foreground)] hover:text-[color:var(--gold)]">
+                  {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              )}
+            </div>
+          </label>
+        ))}
+        {next && (
+          <ul className="text-[11px] space-y-0.5">
+            {["At least 8 characters", "One lowercase letter", "One uppercase letter", "One number", "One special character"].map((r) => {
+              const ok = !issues.includes(r);
+              return (
+                <li key={r} className={`flex items-center gap-1.5 ${ok ? "text-[color:var(--success,oklch(0.72_0.18_145))]" : "text-[color:var(--muted-foreground)]"}`}>
+                  <CheckCircle2 className="h-3 w-3" /> {r}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        <button disabled={busy} className="btn-gold w-full rounded-xl py-2.5 text-sm inline-flex items-center justify-center gap-2 disabled:opacity-60">
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Update Password
+        </button>
+      </form>
+    </section>
+  );
+}
+
+function TwoFactorCard({ enabled, onToggle }: { enabled: boolean; onToggle: (v: boolean) => Promise<boolean> }) {
+  const [busy, setBusy] = useState(false);
+  async function flip() {
+    setBusy(true);
+    const ok = await onToggle(!enabled);
+    setBusy(false);
+    if (ok) toast.success(!enabled ? "2FA enabled (activates when email service is live)" : "2FA disabled");
+  }
+  return (
+    <section className="glass-gold rounded-3xl p-5 sm:p-6 fade-up">
+      <h3 className="display gold-text text-lg inline-flex items-center gap-2"><Smartphone className="h-5 w-5" /> Two-Factor Authentication</h3>
+      <p className="text-[11px] text-[color:var(--muted-foreground)] mt-1">When enabled, Super Admin login requires an Email OTP after password.</p>
+      <div className="mt-4 flex items-center justify-between gap-4 rounded-2xl border border-[oklch(0.78_0.14_82/25%)] bg-[oklch(0.20_0.02_80/40%)] p-4">
+        <div>
+          <div className="text-sm font-bold">Email OTP for Super Admin</div>
+          <div className={`text-xs mt-0.5 ${enabled ? "text-[color:var(--success,oklch(0.72_0.18_145))]" : "text-[color:var(--muted-foreground)]"}`}>
+            {enabled ? "Enabled" : "Disabled"}
+          </div>
+        </div>
+        <button onClick={flip} disabled={busy}
+          className={`relative w-14 h-8 rounded-full transition ${enabled ? "bg-[oklch(0.78_0.14_82)]" : "bg-[oklch(0.30_0.02_60)]"} disabled:opacity-60`}>
+          <span className={`absolute top-1 h-6 w-6 rounded-full bg-white transition-all ${enabled ? "left-7" : "left-1"}`} />
+        </button>
+      </div>
+      <OtpNotice />
+    </section>
+  );
+}
+
+function RecoveryEmailCard({ recovery, verified, onSave }: { recovery: string | null; verified: boolean; onSave: (e: string) => Promise<boolean> }) {
+  const [email, setEmail] = useState(recovery ?? "");
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { setEmail(recovery ?? ""); }, [recovery]);
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    const ok = await onSave(email.trim());
+    setBusy(false);
+    if (ok) toast.success("Recovery email saved (OTP verification pending)");
+  }
+  return (
+    <section className="glass-gold rounded-3xl p-5 sm:p-6 fade-up">
+      <h3 className="display gold-text text-lg inline-flex items-center gap-2"><LifeBuoy className="h-5 w-5" /> Recovery Email</h3>
+      <p className="text-[11px] text-[color:var(--muted-foreground)] mt-1">Used to regain access. Requires OTP verification on both old and new addresses.</p>
+      {recovery && (
+        <div className="mt-3 flex items-center gap-2 text-xs">
+          <span className="text-[color:var(--muted-foreground)]">Current:</span>
+          <span className="font-mono">{recovery}</span>
+          {verified
+            ? <span className="text-[color:var(--success,oklch(0.72_0.18_145))] inline-flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> Verified</span>
+            : <span className="text-[color:var(--gold-light)] inline-flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Unverified</span>}
+        </div>
+      )}
+      <form onSubmit={submit} className="mt-4 flex flex-wrap items-end gap-2">
+        <label className="flex-1 min-w-[200px]">
+          <div className="text-[10px] uppercase tracking-widest text-[color:var(--gold-light)] mb-1.5">Recovery Email</div>
+          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="backup@personal.com"
+            className="w-full bg-[oklch(0.14_0.005_60/60%)] border border-[color:var(--border)] rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[color:var(--gold)]" />
+        </label>
+        <button disabled={busy} className="btn-gold rounded-xl px-4 py-2.5 text-sm inline-flex items-center gap-2 disabled:opacity-60">
+          {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save
+        </button>
+      </form>
+      <OtpNotice />
     </section>
   );
 }
