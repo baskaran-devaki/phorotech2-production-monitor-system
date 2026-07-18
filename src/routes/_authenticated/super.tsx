@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/hooks/useProduction";
 import { toast } from "sonner";
-import { ArrowLeft, LogOut, Loader2, ShieldAlert, UserPlus, Ban, Trash2, ShieldCheck, Shield, Save, Crown } from "lucide-react";
+import { ArrowLeft, LogOut, Loader2, ShieldAlert, UserPlus, Ban, Trash2, ShieldCheck, Shield, Save, Crown, Mail, KeyRound, Smartphone, LifeBuoy, Eye, EyeOff, CheckCircle2, AlertTriangle, Lock } from "lucide-react";
 import {
   listAdminUsers, inviteAdmin, setUserDisabled, deleteAdmin, setAdminRole,
 } from "@/lib/admin.functions";
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_authenticated/super")({
   component: SuperAdminPanel,
 });
 
-type Tab = "admins" | "plant" | "audit";
+type Tab = "admins" | "plant" | "security" | "audit";
 type AdminUser = { id: string; email: string; created_at: string; last_sign_in_at: string | null; banned_until: string | null; roles: string[]; is_super_admin: boolean };
 
 function SuperAdminPanel() {
