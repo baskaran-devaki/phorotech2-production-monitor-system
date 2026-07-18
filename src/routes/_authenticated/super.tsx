@@ -54,16 +54,17 @@ function SuperAdminPanel() {
       </header>
 
       <nav className="glass-gold rounded-2xl p-2 flex flex-wrap gap-1">
-        {(["admins", "plant", "audit"] as const).map((k) => (
+        {(["admins", "plant", "security", "audit"] as const).map((k) => (
           <button key={k} onClick={() => setTab(k)}
             className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${tab === k ? "bg-[oklch(0.78_0.14_82/25%)] text-[color:var(--gold-light)]" : "hover:bg-[oklch(0.78_0.14_82/10%)]"}`}>
-            {k === "admins" ? "Admin Accounts" : k === "plant" ? "Plant Head" : "Audit Logs"}
+            {k === "admins" ? "Admin Accounts" : k === "plant" ? "Plant Head" : k === "security" ? "Security" : "Audit Logs"}
           </button>
         ))}
       </nav>
 
       {tab === "admins" && <AdminsTab currentUserId={user!.id} />}
       {tab === "plant" && <PlantHeadTab />}
+      {tab === "security" && <SecurityTab userEmail={user!.email ?? ""} userId={user!.id} />}
       {tab === "audit" && <AuditTab />}
     </main>
   );
