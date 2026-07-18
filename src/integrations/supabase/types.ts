@@ -161,6 +161,36 @@ export type Database = {
         }
         Relationships: []
       }
+      security_settings: {
+        Row: {
+          created_at: string
+          pending_new_email: string | null
+          recovery_email: string | null
+          recovery_email_verified: boolean
+          two_factor_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          pending_new_email?: string | null
+          recovery_email?: string | null
+          recovery_email_verified?: boolean
+          two_factor_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          pending_new_email?: string | null
+          recovery_email?: string | null
+          recovery_email_verified?: boolean
+          two_factor_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       super_admins: {
         Row: {
           created_at: string
