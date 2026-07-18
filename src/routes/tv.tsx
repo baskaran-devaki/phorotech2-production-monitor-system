@@ -189,31 +189,29 @@ function TvDisplay() {
                 return (
                   <div
                     key={s}
-                    className={`rounded-xl px-3 py-[0.6vh] border min-h-0 ${active ? "border-[color:var(--success)]/60 bg-[oklch(0.72_0.19_145/8%)]" : "border-white/10 bg-white/[0.02]"}`}
+                    className={`rounded-xl px-[0.8vw] py-[0.5vh] border min-h-0 flex flex-col ${active ? "border-[color:var(--success)]/60 bg-[oklch(0.72_0.19_145/8%)]" : "border-white/10 bg-white/[0.02]"}`}
                   >
-                    <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 min-w-0 h-full">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2">
-                          {active && <span className="h-[0.9vh] w-[0.9vh] rounded-full bg-[color:var(--success)] pulse-green shrink-0" />}
-                          <div className={`font-[family-name:var(--font-display)] font-extrabold text-white truncate ${F.small}`}>
-                            {SHIFTS[s].label}
-                          </div>
-                        </div>
-                        <div className={`font-[family-name:var(--font-mono)] text-white/80 truncate ${F.cardLabel}`}>
-                          {SHIFTS[s].range}
-                        </div>
+                    <div className="flex items-center gap-2 min-w-0">
+                      {active && <span className="h-[0.9vh] w-[0.9vh] rounded-full bg-[color:var(--success)] pulse-green shrink-0" />}
+                      <div className={`font-[family-name:var(--font-display)] font-extrabold text-white truncate ${F.small}`}>
+                        {SHIFTS[s].label}
                       </div>
-                      <div className="text-right min-w-0">
-                        <div className={`uppercase text-white/60 font-bold ${F.cardLabel}`}>Actual</div>
-                        <div className={`font-[family-name:var(--font-mono)] font-extrabold leading-none ${F.mid}`} style={{ color }}>
+                      <div className={`font-[family-name:var(--font-mono)] text-white/70 truncate ml-auto ${F.cardLabel}`}>
+                        {SHIFTS[s].range}
+                      </div>
+                    </div>
+                    <div className="mt-[0.3vh] grid grid-cols-2 gap-[0.6vw] flex-1 min-h-0">
+                      <div className="rounded-lg bg-black/30 border border-white/5 flex flex-col items-center justify-center min-w-0 px-2">
+                        <div className={`font-[family-name:var(--font-mono)] font-black leading-none text-center ${F.big}`} style={{ color }}>
                           {actual}
                         </div>
+                        <div className={`uppercase text-white/60 tracking-widest font-bold text-center mt-[0.2vh] ${F.cardLabel}`}>Actual</div>
                       </div>
-                      <div className="text-right min-w-0">
-                        <div className={`uppercase text-white/60 font-bold ${F.cardLabel}`}>Target</div>
-                        <div className={`font-[family-name:var(--font-mono)] font-extrabold text-white/85 leading-none ${F.mid}`}>
+                      <div className="rounded-lg bg-black/30 border border-white/5 flex flex-col items-center justify-center min-w-0 px-2">
+                        <div className={`font-[family-name:var(--font-mono)] font-black text-white leading-none text-center ${F.big}`}>
                           {SHIFT_TARGET}
                         </div>
+                        <div className={`uppercase text-white/60 tracking-widest font-bold text-center mt-[0.2vh] ${F.cardLabel}`}>Target</div>
                       </div>
                     </div>
                   </div>
