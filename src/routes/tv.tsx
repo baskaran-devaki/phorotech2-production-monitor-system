@@ -257,65 +257,34 @@ function TvDisplay() {
           {[
             {
               title: "Last Hour Production",
-              sub: lastHour?.slot ?? "—",
+              subtitle: lastHour?.slot ?? "—",
               actual: lastHour ? String(lastHour.loads) : "—",
               target: "10",
               glow: "cyan-glow",
             },
             {
               title: "Last Day Production",
-              sub: lastDay ? formatDMY(lastDay.date) : "—",
+              subtitle: lastDay ? formatDMY(lastDay.date) : "—",
               actual: lastDay ? String(lastDay.loads) : "—",
               target: String(DAILY_TARGET),
               glow: "",
             },
             {
               title: "Last Month Production",
-              sub: monthNameFromKey(prevMKey),
+              subtitle: monthNameFromKey(prevMKey),
               actual: lastMonthActual.toLocaleString("en-IN"),
               target: MONTHLY_TARGET.toLocaleString("en-IN"),
               glow: "",
             },
             {
               title: "Highest Production",
-              sub: highest.date ? formatDMY(highest.date) : "—",
+              subtitle: highest.date ? formatDMY(highest.date) : "—",
               actual: String(highest.dailyTotal),
-              target: "Loads",
+              target: String(DAILY_TARGET),
               glow: "gold-glow",
-              singleValue: true,
             },
           ].map((c, i) => (
-            <div key={i} className={`glass-gold rounded-2xl p-[0.9vw] min-w-0 min-h-0 overflow-hidden flex flex-col ${c.glow}`}>
-              <div className={`uppercase tracking-[0.2em] text-[color:var(--cyan)] font-extrabold truncate ${F.cardHead}`}>
-                {c.title}
-              </div>
-              <div className={`font-[family-name:var(--font-mono)] text-white font-bold truncate ${F.small}`}>
-                {c.sub}
-              </div>
-              {c.singleValue ? (
-                <div className="mt-auto">
-                  <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>{c.target}</div>
-                  <div className={`font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none ${F.big}`}>
-                    {c.actual}
-                  </div>
-                </div>
-              ) : (
-                <div className="mt-auto grid grid-cols-2 gap-2 min-w-0">
-                  <div className="min-w-0">
-                    <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Actual</div>
-                    <div className={`font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none ${F.big}`}>
-                      {c.actual}
-                    </div>
-                  </div>
-                  <div className="min-w-0">
-                    <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Target</div>
-                    <div className={`font-[family-name:var(--font-mono)] text-white font-extrabold leading-none ${F.big}`}>
-                      {c.target}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <MetricCard key={i} {...c} />
           ))}
         </section>
       </main>
