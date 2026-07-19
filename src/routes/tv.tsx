@@ -201,29 +201,12 @@ function TvDisplay() {
 
         {/* Middle column: Total Loads Today + Shift Details */}
         <section className="col-span-12 lg:col-span-4 flex flex-col gap-[1.2vw] min-w-0 min-h-0">
-          <div className="glass-gold rounded-2xl p-[1.1vw] min-w-0 overflow-hidden">
-            <div className="flex items-center gap-2 mb-[0.4vh]">
-              <span className="h-[1vh] w-[1vh] rounded-full bg-[color:var(--success)] pulse-green" />
-              <span className={`font-extrabold tracking-widest text-[color:var(--success)] ${F.cardLabel}`}>● LIVE</span>
-            </div>
-            <div className={`uppercase tracking-[0.25em] text-[color:var(--cyan)] font-extrabold ${F.cardHead}`}>
-              Total Loads Today
-            </div>
-            <div className="mt-[0.6vh] grid grid-cols-2 gap-2 min-w-0">
-              <div className="min-w-0">
-                <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Actual</div>
-                <div className={`font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none ${F.big}`}>
-                  {todayActual}
-                </div>
-              </div>
-              <div className="min-w-0">
-                <div className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Target</div>
-                <div className={`font-[family-name:var(--font-mono)] text-white font-extrabold leading-none ${F.big}`}>
-                  {DAILY_TARGET}
-                </div>
-              </div>
-            </div>
-          </div>
+          <MetricCard
+            title="Total Loads Today"
+            actual={todayActual}
+            target={DAILY_TARGET}
+            live
+          />
 
           <div className="glass-gold rounded-2xl p-[1.1vw] flex-1 min-w-0 min-h-0 overflow-hidden flex flex-col">
             <div className={`uppercase tracking-[0.25em] text-[color:var(--cyan)] font-extrabold mb-[0.6vh] ${F.cardHead}`}>
