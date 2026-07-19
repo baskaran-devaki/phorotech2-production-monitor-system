@@ -71,6 +71,54 @@ function TvDisplay() {
     small: "text-[clamp(14px,1.6vw,26px)]",
   };
 
+  const MetricCard = ({
+    title,
+    subtitle,
+    actual,
+    target,
+    glow = "",
+    live = false,
+  }: {
+    title: string;
+    subtitle?: string;
+    actual: string | number;
+    target: string | number;
+    glow?: string;
+    live?: boolean;
+  }) => (
+    <div className={`glass-gold rounded-2xl p-[0.9vw] min-w-0 overflow-hidden flex flex-col ${glow}`}>
+      <div className="flex items-center gap-2 min-w-0">
+        {live && <span className="h-[1vh] w-[1vh] rounded-full bg-[color:var(--success)] pulse-green shrink-0" />}
+        <div className={`uppercase tracking-[0.25em] text-[color:var(--cyan)] font-extrabold truncate ${F.cardHead}`}>
+          {title}
+        </div>
+      </div>
+      {subtitle && (
+        <div className={`font-[family-name:var(--font-mono)] text-white font-bold truncate ${F.small}`}>
+          {subtitle}
+        </div>
+      )}
+      <div className="mt-[0.3vh] grid grid-cols-2 gap-[0.6vw] flex-1 min-h-0">
+        <div className="rounded-lg bg-black/30 border border-white/5 flex flex-col items-center justify-center min-w-0 px-1">
+          <div className={`font-[family-name:var(--font-mono)] gold-text font-black leading-none text-center ${F.big}`}>
+            {actual}
+          </div>
+          <div className={`uppercase text-white/60 tracking-widest font-bold text-center mt-[0.2vh] ${F.cardLabel}`}>
+            Actual Loads
+          </div>
+        </div>
+        <div className="rounded-lg bg-black/30 border border-white/5 flex flex-col items-center justify-center min-w-0 px-1">
+          <div className={`font-[family-name:var(--font-mono)] text-white font-black leading-none text-center ${F.big}`}>
+            {target}
+          </div>
+          <div className={`uppercase text-white/60 tracking-widest font-bold text-center mt-[0.2vh] ${F.cardLabel}`}>
+            Target Loads
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div
       className="w-screen h-screen overflow-hidden text-white flex flex-col"
