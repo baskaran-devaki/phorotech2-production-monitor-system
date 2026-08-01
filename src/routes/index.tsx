@@ -10,8 +10,8 @@ import {
   ALL_SHIFTS, businessDate, currentMonthKey, dailyTotalsForMonth,
   highestOfMonth, monthKey, monthName, sumLoads,
 } from "@/lib/production";
-import { downloadMonthlyExcel, downloadMonthlyPDF } from "@/lib/pdf-export";
-import { Download, FileSpreadsheet, RefreshCw, Wifi, WifiOff } from "lucide-react";
+import { ReportDialog } from "@/components/report/ReportDialog";
+import { FileText, RefreshCw, Wifi, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
@@ -23,6 +23,7 @@ function Dashboard() {
   const { user, isAdmin, isSuperAdmin } = useAuthUser();
   const [tick, setTick] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   useEffect(() => setMounted(true), []);
 
 
