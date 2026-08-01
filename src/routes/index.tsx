@@ -10,8 +10,8 @@ import {
   ALL_SHIFTS, businessDate, currentMonthKey, dailyTotalsForMonth,
   highestOfMonth, monthKey, monthName, sumLoads,
 } from "@/lib/production";
-import { downloadMonthlyExcel, downloadMonthlyPDF } from "@/lib/pdf-export";
-import { Download, FileSpreadsheet, RefreshCw, Wifi, WifiOff } from "lucide-react";
+import { ReportDialog } from "@/components/report/ReportDialog";
+import { FileText, RefreshCw, Wifi, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
@@ -23,6 +23,7 @@ function Dashboard() {
   const { user, isAdmin, isSuperAdmin } = useAuthUser();
   const [tick, setTick] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   useEffect(() => setMounted(true), []);
 
 
@@ -65,16 +66,20 @@ function Dashboard() {
             className="rounded-xl border border-[color:var(--border)] px-3 py-2 text-xs sm:text-sm inline-flex items-center justify-center gap-2 hover:bg-[oklch(0.78_0.14_82/10%)] transition">
             <RefreshCw className="h-4 w-4" /> Refresh
           </button>
-          <button onClick={() => { downloadMonthlyExcel(entries, mKey); toast.success("Excel downloaded"); }}
-            className="rounded-xl border border-[color:var(--border)] px-3 py-2 text-xs sm:text-sm inline-flex items-center justify-center gap-2 hover:bg-[oklch(0.78_0.14_82/10%)] transition">
-            <FileSpreadsheet className="h-4 w-4" /> Excel
-          </button>
-          <button onClick={() => { downloadMonthlyPDF(entries, mKey); toast.success("PDF generated"); }}
-            className="btn-gold rounded-xl px-4 py-2 text-xs sm:text-sm inline-flex items-center justify-center gap-2 col-span-2 sm:col-span-1">
-            <Download className="h-4 w-4" /> Download Monthly Report
+          <button onClick={() => setReportOpen(true)}
+            className="btn-gold rounded-xl px-4 py-2 text-xs sm:text-sm inline-flex items-center justify-center gap-2">
+            <FileText className="h-4 w-4" /> Monthly Report
           </button>
         </div>
       </section>
+
+      <ReportDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        entries={entries}
+        generatedBy={user?.email ?? "Guest"}
+      />
+
 
       <footer className="text-center text-xs text-[color:var(--muted-foreground)] pt-2 pb-6">
         © {new Date().getFullYear()} Phorotech Surfin India Pvt Ltd · Plant II · ED Plant · Irungattukottai

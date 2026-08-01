@@ -1,0 +1,171 @@
+import ExcelJS from "exceljs";
+import { ALL_SHIFTS, SHIFTS, formatDMY } from "./production";
+import type { ReportData } from "./report";
+
+const GOLD = "FFB08922";
+const LIGHT = "FFF8F4E6";
+
+function border(): Partial<ExcelJS.Borders> {
+  const s: ExcelJS.Border = { style: "thin", color: { argb: "FFBFBFBF" } };
+  return { top: s, left: s, bottom: s, right: s };
+}
+
+export async function generateReportExcel(
+  report: ReportData,
+  withHourly: boolean,
+  generatedBy: string,
+) {
+  const wb = new ExcelJS.Workbook();
+  wb.creator = "PPMS";
+  const ws = wb.addWorksheet("Report", {
+    pageSetup: { paperSize: 9, orientation: withHourly ? "landscape" : "portrait" },
+  });
+
+  const cols = withHourly ? 12 : 6;
+  const lastCol = String.fromCharCode(64 + cols);
+
+  const titleRows = [
+    "PHOROTECH SURFIN INDIA PVT LTD",
+    "Plant-II | ED Plant | Irungattukottai",
+    "MONTHLY PRODUCTION REPORT",
+    `Reporting Period: ${report.periodLabel}`,
+  ];
+  titleRows.forEach((t, i) => {
+    const r = ws.getRow(i + 1);
+    ws.mergeCells(`A${i + 1}:${lastCol}${i + 1}`);
+    r.getCell(1).value = t;
+    r.getCell(1).alignment = { horizontal: "center", vertical: "middle" };
+    r.getCell(1).font = {
+      name: "Arial",
+      bold: true,
+      size: i === 0 ? 14 : i === 2 ? 12 : 10,
+      color: { argb: i === 0 ? "FF7A5C00" : "FF111111" },
+    };
+    r.height = i === 0 ? 22 : 16;
+  });
+
+  let row = 6;
+  const kv = (label: string, value: string | number) => {
+    const r = ws.getRow(row++);
+    r.getCell(1).value = label;
+    r.getCell(1).font = { name: "Arial", bold: true, size: 10 };
+    r.getCell(1).fill = { type: "pattern", pattern: "solid", fgColor: { argb: LIGHT } };
+    r.getCell(1).border = border();
+    r.getCell(2).value = value;
+    r.getCell(2).font = { name: "Arial", size: 10 };
+    r.getCell(2).border = border();
+  };
+
+  kv("Plant", "ED");
+  kv("Total Working Days", report.totalWorkingDays);
+  kv("Sundays Production Days", report.sundayWorkingDays);
+  kv("Total Actual Loads", report.totalActual);
+  kv("Total Target Loads", report.totalTarget);
+  kv("Monthly Achievement %", `${report.achievement.toFixed(1)} %`);
+  row++;
+  kv("1st Shift Total Loads", report.shiftTotals[1]);
+  kv("2nd Shift Total Loads", report.shiftTotals[2]);
+  kv("3rd Shift Total Loads", report.shiftTotals[3]);
+  kv("Sunday Production Total Loads", report.sundayTotal);
+  row++;
+  kv("Highest Production Day", formatDMY(report.highest.date));
+  kv("Highest Day Total Loads", report.highest.loads);
+  row += 2;
+
+  const headerRow = (values: (string | number)[]) => {
+    const r = ws.getRow(row++);
+    values.forEach((v, i) => {
+      const c = r.getCell(i + 1);
+      c.value = v;
+      c.font = { name: "Arial", bold: true, size: 10, color: { argb: "FF111111" } };
+      c.fill = { type: "pattern", pattern: "solid", fgColor: { argb: GOLD } };
+      c.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+      c.border = border();
+    });
+    return r;
+  };
+  const dataRow = (values: (string | number)[], bold = false) => {
+    const r = ws.getRow(row++);
+    values.forEach((v, i) => {
+      const c = r.getCell(i + 1);
+      c.value = v;
+      c.font = { name: "Arial", size: 10, bold };
+      c.alignment = { horizontal: i === 0 ? "left" : "center" };
+      c.border = border();
+      if (bold) c.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF0F0F0" } };
+    });
+  };
+
+  if (!withHourly) {
+    headerRow(["Date", "Shift 1 Total", "Shift 2 Total", "Shift 3 Total", "Daily Total", "Remarks"]);
+    for (const d of report.days) {
+      dataRow([
+        formatDMY(d.date),
+        d.shiftTotals[1],
+        d.shiftTotals[2],
+        d.shiftTotals[3],
+        d.total,
+        d.remarks,
+      ]);
+    }
+    dataRow(
+      [
+        "TOTAL",
+        report.shiftTotals[1],
+        report.shiftTotals[2],
+        report.shiftTotals[3],
+        report.totalActual,
+        "",
+      ],
+      true,
+    );
+    ws.columns.forEach((c, i) => (c.width = i === 0 ? 16 : i === 5 ? 40 : 15));
+  } else {
+    headerRow([
+      "Date",
+      "Shift",
+      ...SHIFTS[1].slots.map((_, i) => `Hour ${i + 1}`),
+      "Shift Total",
+      "Daily Total",
+    ]);
+    for (const d of report.days) {
+      ALL_SHIFTS.forEach((s, idx) => {
+        const h = d.hourly.find((x) => x.shift === s)!;
+        dataRow([
+          idx === 0 ? formatDMY(d.date) : "",
+          SHIFTS[s].label,
+          ...h.slots.map((sl) => sl.loads),
+          h.shiftTotal,
+          idx === 0 ? d.total : "",
+        ]);
+      });
+    }
+    dataRow(
+      [
+        "TOTAL",
+        "",
+        ...SHIFTS[1].slots.map(() => ""),
+        "",
+        report.totalActual,
+      ],
+      true,
+    );
+    ws.columns.forEach((c, i) => (c.width = i === 0 ? 16 : i === 1 ? 12 : 11));
+  }
+
+  row++;
+  const foot = ws.getRow(row++);
+  foot.getCell(1).value = `Generated On: ${new Date().toLocaleString("en-IN")}  |  Generated By: ${generatedBy}  |  PPMS - Production Performance Monitoring System`;
+  foot.getCell(1).font = { name: "Arial", size: 9, italic: true, color: { argb: "FF666666" } };
+
+  const buf = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buf], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `PPMS-Production-Report-${report.from}_to_${report.to}.xlsx`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
