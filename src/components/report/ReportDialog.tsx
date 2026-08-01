@@ -103,6 +103,7 @@ export function ReportDialog({
     const p = resolvePeriod();
     if (!p) return;
     setViewing(true);
+    onOpenChange(false);
   }
 
   return (
