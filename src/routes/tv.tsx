@@ -7,6 +7,7 @@ import {
   highestOfMonth, lastCompletedHour, lastDayTotal, monthName, monthNameFromKey,
   previousMonthKey, sumLoads, totalForMonth,
 } from "@/lib/production";
+import { buildReport, monthRange } from "@/lib/report";
 import logoAsset from "@/assets/phorotech-logo.jpg.asset.json";
 
 export const Route = createFileRoute("/tv")({
