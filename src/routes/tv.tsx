@@ -57,6 +57,7 @@ function TvDisplay() {
   // Fluid sizes — always fit any TV/desktop/laptop/tablet without scrolling.
   const F = {
     title: "text-[clamp(14px,1.6vw,28px)]",
+    ppms: "text-[clamp(26px,3.4vw,64px)]",
     subtitle: "text-[clamp(10px,1vw,18px)]",
     clock: "text-[clamp(18px,2.2vw,44px)]",
     date: "text-[clamp(10px,1vw,18px)]",
