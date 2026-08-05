@@ -125,7 +125,7 @@ function TvDisplay() {
       style={{ background: "#000" }}
     >
       {/* Header */}
-      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-[2vw] py-[1vh] border-b border-[oklch(0.78_0.14_82/25%)] shrink-0">
+      <header className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-[2vw] py-[1vh] border-b border-[oklch(0.78_0.14_82/25%)] shrink-0">
         <div className="flex items-center gap-3 min-w-0">
           <div className="h-[6vh] w-[6vh] shrink-0 rounded-xl overflow-hidden bg-white p-1">
             <img src={logoAsset.url} alt="Phorotech" className="h-full w-full object-contain" />
@@ -139,7 +139,15 @@ function TvDisplay() {
             </p>
           </div>
         </div>
-        <div className="text-right shrink-0">
+        <div className="text-center min-w-0 px-2">
+          <div className={`font-[family-name:var(--font-display)] gold-text font-black leading-none tracking-[0.15em] ${F.ppms}`}>
+            PPMS
+          </div>
+          <div className={`mt-[0.4vh] uppercase text-white/85 font-bold tracking-[0.18em] truncate ${F.subtitle}`}>
+            Production Performance Monitoring System
+          </div>
+        </div>
+        <div className="text-right shrink-0 justify-self-end">
           <div className={`font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none ${F.clock}`}>
             {now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true })}
           </div>
@@ -148,6 +156,7 @@ function TvDisplay() {
           </div>
         </div>
       </header>
+
 
       {/* Main */}
       <main className="flex-1 min-h-0 grid grid-cols-12 gap-[1.2vw] p-[1.2vw]">
