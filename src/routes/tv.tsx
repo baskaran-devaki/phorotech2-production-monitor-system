@@ -119,8 +119,20 @@ function TvDisplay() {
           </div>
         </div>
       </div>
+      {achievement !== undefined && (
+        <div className="mt-[0.4vh] flex items-baseline justify-between gap-2 min-w-0">
+          <span className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Achievement</span>
+          <span
+            className={`font-[family-name:var(--font-mono)] font-extrabold ${F.small}`}
+            style={{ color: achColor(achievement) }}
+          >
+            {achievement.toFixed(1)}%
+          </span>
+        </div>
+      )}
     </div>
   );
+
 
   return (
     <div
