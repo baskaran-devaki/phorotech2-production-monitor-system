@@ -48,6 +48,12 @@ function TvDisplay() {
   const lastDay = useMemo(() => lastDayTotal(entries, now), [entries, now]);
   const prevMKey = useMemo(() => previousMonthKey(now), [now]);
   const lastMonthActual = useMemo(() => totalForMonth(entries, prevMKey), [entries, prevMKey]);
+  const lastMonthReport = useMemo(() => {
+    const { from, to } = monthRange(prevMKey);
+    return buildReport(entries, from, to);
+  }, [entries, prevMKey]);
+  const lastMonthTarget = lastMonthReport.totalTarget;
+  const lastMonthAch = lastMonthTarget > 0 ? (lastMonthActual / lastMonthTarget) * 100 : 0;
   const highest = useMemo(() => highestOfMonth(entries, mKey), [entries, mKey]);
   const celebrate = useMemo(() => celebratedDays(entries, mKey), [entries, mKey]);
 
