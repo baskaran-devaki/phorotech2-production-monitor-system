@@ -79,6 +79,7 @@ function TvDisplay() {
     target,
     glow = "",
     live = false,
+    achievement,
   }: {
     title: string;
     subtitle?: string;
@@ -86,6 +87,7 @@ function TvDisplay() {
     target: string | number;
     glow?: string;
     live?: boolean;
+    achievement?: number;
   }) => (
     <div className={`glass-gold rounded-2xl p-[0.9vw] min-w-0 overflow-hidden flex flex-col ${glow}`}>
       <div className="flex items-center gap-2 min-w-0">
