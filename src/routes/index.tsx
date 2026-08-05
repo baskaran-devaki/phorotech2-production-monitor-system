@@ -66,10 +66,12 @@ function Dashboard() {
             className="rounded-xl border border-[color:var(--border)] px-3 py-2 text-xs sm:text-sm inline-flex items-center justify-center gap-2 hover:bg-[oklch(0.78_0.14_82/10%)] transition">
             <RefreshCw className="h-4 w-4" /> Refresh
           </button>
-          <button onClick={() => setReportOpen(true)}
-            className="btn-gold rounded-xl px-4 py-2 text-xs sm:text-sm inline-flex items-center justify-center gap-2">
-            <FileText className="h-4 w-4" /> Monthly Report
-          </button>
+          {user && (
+            <button onClick={() => setReportOpen(true)}
+              className="btn-gold rounded-xl px-4 py-2 text-xs sm:text-sm inline-flex items-center justify-center gap-2">
+              <FileText className="h-4 w-4" /> Monthly Report
+            </button>
+          )}
         </div>
       </section>
 
