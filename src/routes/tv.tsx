@@ -318,6 +318,7 @@ const MetricCard = ({
               actual: lastMonthActual.toLocaleString("en-IN"),
               target: lastMonthTarget.toLocaleString("en-IN"),
               achievement: lastMonthAch,
+              achievementTopRight: true,
               glow: "",
             },
             {
