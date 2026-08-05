@@ -7,6 +7,7 @@ import {
   highestOfMonth, lastCompletedHour, lastDayTotal, monthName, monthNameFromKey,
   previousMonthKey, sumLoads, totalForMonth,
 } from "@/lib/production";
+import { buildReport, monthRange } from "@/lib/report";
 import logoAsset from "@/assets/phorotech-logo.jpg.asset.json";
 
 export const Route = createFileRoute("/tv")({
@@ -48,6 +49,12 @@ function TvDisplay() {
   const lastDay = useMemo(() => lastDayTotal(entries, now), [entries, now]);
   const prevMKey = useMemo(() => previousMonthKey(now), [now]);
   const lastMonthActual = useMemo(() => totalForMonth(entries, prevMKey), [entries, prevMKey]);
+  const lastMonthReport = useMemo(() => {
+    const { from, to } = monthRange(prevMKey);
+    return buildReport(entries, from, to);
+  }, [entries, prevMKey]);
+  const lastMonthTarget = lastMonthReport.totalTarget;
+  const lastMonthAch = lastMonthTarget > 0 ? (lastMonthActual / lastMonthTarget) * 100 : 0;
   const highest = useMemo(() => highestOfMonth(entries, mKey), [entries, mKey]);
   const celebrate = useMemo(() => celebratedDays(entries, mKey), [entries, mKey]);
 
@@ -57,6 +64,7 @@ function TvDisplay() {
   // Fluid sizes — always fit any TV/desktop/laptop/tablet without scrolling.
   const F = {
     title: "text-[clamp(14px,1.6vw,28px)]",
+    ppms: "text-[clamp(26px,3.4vw,64px)]",
     subtitle: "text-[clamp(10px,1vw,18px)]",
     clock: "text-[clamp(18px,2.2vw,44px)]",
     date: "text-[clamp(10px,1vw,18px)]",
@@ -78,6 +86,7 @@ function TvDisplay() {
     target,
     glow = "",
     live = false,
+    achievement,
   }: {
     title: string;
     subtitle?: string;
@@ -85,6 +94,7 @@ function TvDisplay() {
     target: string | number;
     glow?: string;
     live?: boolean;
+    achievement?: number;
   }) => (
     <div className={`glass-gold rounded-2xl p-[0.9vw] min-w-0 overflow-hidden flex flex-col ${glow}`}>
       <div className="flex items-center gap-2 min-w-0">
@@ -116,8 +126,20 @@ function TvDisplay() {
           </div>
         </div>
       </div>
+      {achievement !== undefined && (
+        <div className="mt-[0.4vh] flex items-baseline justify-between gap-2 min-w-0">
+          <span className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Achievement</span>
+          <span
+            className={`font-[family-name:var(--font-mono)] font-extrabold ${F.small}`}
+            style={{ color: achColor(achievement) }}
+          >
+            {achievement.toFixed(1)}%
+          </span>
+        </div>
+      )}
     </div>
   );
+
 
   return (
     <div
@@ -125,7 +147,7 @@ function TvDisplay() {
       style={{ background: "#000" }}
     >
       {/* Header */}
-      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-[2vw] py-[1vh] border-b border-[oklch(0.78_0.14_82/25%)] shrink-0">
+      <header className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 px-[2vw] py-[1vh] border-b border-[oklch(0.78_0.14_82/25%)] shrink-0">
         <div className="flex items-center gap-3 min-w-0">
           <div className="h-[6vh] w-[6vh] shrink-0 rounded-xl overflow-hidden bg-white p-1">
             <img src={logoAsset.url} alt="Phorotech" className="h-full w-full object-contain" />
@@ -139,7 +161,15 @@ function TvDisplay() {
             </p>
           </div>
         </div>
-        <div className="text-right shrink-0">
+        <div className="text-center min-w-0 px-2">
+          <div className={`font-[family-name:var(--font-display)] gold-text font-black leading-none tracking-[0.15em] ${F.ppms}`}>
+            PPMS
+          </div>
+          <div className={`mt-[0.4vh] uppercase text-white/85 font-bold tracking-[0.18em] truncate ${F.subtitle}`}>
+            Production Performance Monitoring System
+          </div>
+        </div>
+        <div className="text-right shrink-0 justify-self-end">
           <div className={`font-[family-name:var(--font-mono)] gold-text font-extrabold leading-none ${F.clock}`}>
             {now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true })}
           </div>
@@ -148,6 +178,7 @@ function TvDisplay() {
           </div>
         </div>
       </header>
+
 
       {/* Main */}
       <main className="flex-1 min-h-0 grid grid-cols-12 gap-[1.2vw] p-[1.2vw]">
@@ -273,7 +304,8 @@ function TvDisplay() {
               title: "Last Month Production",
               subtitle: monthNameFromKey(prevMKey),
               actual: lastMonthActual.toLocaleString("en-IN"),
-              target: MONTHLY_TARGET.toLocaleString("en-IN"),
+              target: lastMonthTarget.toLocaleString("en-IN"),
+              achievement: lastMonthAch,
               glow: "",
             },
             {

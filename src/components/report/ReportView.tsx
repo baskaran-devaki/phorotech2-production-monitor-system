@@ -1,7 +1,7 @@
 import { ALL_SHIFTS, SHIFTS, formatDMY } from "@/lib/production";
 import type { ReportData } from "@/lib/report";
 import logoAsset from "@/assets/phorotech-logo.jpg.asset.json";
-import { Printer, X } from "lucide-react";
+import { X } from "lucide-react";
 
 export function ReportView({
   report,
@@ -24,12 +24,6 @@ export function ReportView({
       <div className="no-print sticky top-0 z-10 flex items-center justify-between gap-2 bg-[#0b0b0b] border-b border-[color:var(--border)] px-4 py-3">
         <span className="text-sm font-bold text-white">Report Preview — {report.periodLabel}</span>
         <div className="flex gap-2">
-          <button
-            onClick={() => window.print()}
-            className="btn-gold rounded-xl px-3 py-2 text-sm inline-flex items-center gap-2"
-          >
-            <Printer className="h-4 w-4" /> Print
-          </button>
           <button
             onClick={onClose}
             className="rounded-xl border border-[color:var(--border)] px-3 py-2 text-sm text-white inline-flex items-center gap-2"
