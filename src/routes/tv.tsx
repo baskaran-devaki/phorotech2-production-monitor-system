@@ -304,7 +304,8 @@ function TvDisplay() {
               title: "Last Month Production",
               subtitle: monthNameFromKey(prevMKey),
               actual: lastMonthActual.toLocaleString("en-IN"),
-              target: MONTHLY_TARGET.toLocaleString("en-IN"),
+              target: lastMonthTarget.toLocaleString("en-IN"),
+              achievement: lastMonthAch,
               glow: "",
             },
             {
