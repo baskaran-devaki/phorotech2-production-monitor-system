@@ -1,7 +1,7 @@
 import { ALL_SHIFTS, SHIFTS, formatDMY } from "@/lib/production";
 import type { ReportData } from "@/lib/report";
 import logoAsset from "@/assets/phorotech-logo.jpg.asset.json";
-import { Printer, X } from "lucide-react";
+import { X } from "lucide-react";
 
 export function ReportView({
   report,
