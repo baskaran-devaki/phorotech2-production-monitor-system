@@ -79,7 +79,7 @@ function TvDisplay() {
     small: "text-[clamp(14px,1.6vw,26px)]",
   };
 
-  const MetricCard = ({
+const MetricCard = ({
     title,
     subtitle,
     actual,
@@ -87,6 +87,7 @@ function TvDisplay() {
     glow = "",
     live = false,
     achievement,
+    achievementTopRight = false,
   }: {
     title: string;
     subtitle?: string;
@@ -95,13 +96,24 @@ function TvDisplay() {
     glow?: string;
     live?: boolean;
     achievement?: number;
+    achievementTopRight?: boolean;
   }) => (
     <div className={`glass-gold rounded-2xl p-[0.9vw] min-w-0 overflow-hidden flex flex-col ${glow}`}>
-      <div className="flex items-center gap-2 min-w-0">
-        {live && <span className="h-[1vh] w-[1vh] rounded-full bg-[color:var(--success)] pulse-green shrink-0" />}
-        <div className={`uppercase tracking-[0.25em] text-[color:var(--cyan)] font-extrabold truncate ${F.cardHead}`}>
-          {title}
+      <div className="flex items-center gap-2 min-w-0 justify-between">
+        <div className="flex items-center gap-2 min-w-0">
+          {live && <span className="h-[1vh] w-[1vh] rounded-full bg-[color:var(--success)] pulse-green shrink-0" />}
+          <div className={`uppercase tracking-[0.25em] text-[color:var(--cyan)] font-extrabold truncate ${F.cardHead}`}>
+            {title}
+          </div>
         </div>
+        {achievementTopRight && achievement !== undefined && (
+          <span
+            className={`font-[family-name:var(--font-mono)] font-extrabold shrink-0 ${F.cardLabel}`}
+            style={{ color: achColor(achievement) }}
+          >
+            {achievement.toFixed(1)}%
+          </span>
+        )}
       </div>
       {subtitle && (
         <div className={`font-[family-name:var(--font-mono)] text-white font-bold truncate ${F.small}`}>
@@ -126,7 +138,7 @@ function TvDisplay() {
           </div>
         </div>
       </div>
-      {achievement !== undefined && (
+      {achievement !== undefined && !achievementTopRight && (
         <div className="mt-[0.4vh] flex items-baseline justify-between gap-2 min-w-0">
           <span className={`uppercase text-white/70 tracking-widest font-bold ${F.cardLabel}`}>Achievement</span>
           <span
@@ -306,6 +318,7 @@ function TvDisplay() {
               actual: lastMonthActual.toLocaleString("en-IN"),
               target: lastMonthTarget.toLocaleString("en-IN"),
               achievement: lastMonthAch,
+              achievementTopRight: true,
               glow: "",
             },
             {
