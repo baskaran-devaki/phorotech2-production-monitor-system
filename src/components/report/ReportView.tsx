@@ -25,12 +25,6 @@ export function ReportView({
         <span className="text-sm font-bold text-white">Report Preview — {report.periodLabel}</span>
         <div className="flex gap-2">
           <button
-            onClick={() => window.print()}
-            className="btn-gold rounded-xl px-3 py-2 text-sm inline-flex items-center gap-2"
-          >
-            <Printer className="h-4 w-4" /> Print
-          </button>
-          <button
             onClick={onClose}
             className="rounded-xl border border-[color:var(--border)] px-3 py-2 text-sm text-white inline-flex items-center gap-2"
           >
