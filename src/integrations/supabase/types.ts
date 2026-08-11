@@ -239,6 +239,32 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_production_load: {
+        Args: {
+          _entry_date: string
+          _shift: number
+          _slot_index: number
+          _time_slot: string
+        }
+        Returns: {
+          created_at: string
+          created_by: string | null
+          entry_date: string
+          id: string
+          load_count: number
+          remarks: string | null
+          shift: number
+          slot_index: number
+          time_slot: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "production_entries"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
