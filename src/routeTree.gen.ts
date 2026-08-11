@@ -17,6 +17,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSuperRouteImport } from './routes/_authenticated/super'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as ApiPublicRecordProductionRouteImport } from './routes/api/public/record-production'
 
 const TvRoute = TvRouteImport.update({
   id: '/tv',
@@ -57,6 +58,12 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicRecordProductionRoute =
+  ApiPublicRecordProductionRouteImport.update({
+    id: '/api/public/record-production',
+    path: '/api/public/record-production',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/tv': typeof TvRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/super': typeof AuthenticatedSuperRoute
+  '/api/public/record-production': typeof ApiPublicRecordProductionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +83,7 @@ export interface FileRoutesByTo {
   '/tv': typeof TvRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/super': typeof AuthenticatedSuperRoute
+  '/api/public/record-production': typeof ApiPublicRecordProductionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +95,7 @@ export interface FileRoutesById {
   '/tv': typeof TvRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/super': typeof AuthenticatedSuperRoute
+  '/api/public/record-production': typeof ApiPublicRecordProductionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/tv'
     | '/admin'
     | '/super'
+    | '/api/public/record-production'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/tv'
     | '/admin'
     | '/super'
+    | '/api/public/record-production'
   id:
     | '__root__'
     | '/'
@@ -116,6 +128,7 @@ export interface FileRouteTypes {
     | '/tv'
     | '/_authenticated/admin'
     | '/_authenticated/super'
+    | '/api/public/record-production'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -125,6 +138,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TvRoute: typeof TvRoute
+  ApiPublicRecordProductionRoute: typeof ApiPublicRecordProductionRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -185,6 +199,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/record-production': {
+      id: '/api/public/record-production'
+      path: '/api/public/record-production'
+      fullPath: '/api/public/record-production'
+      preLoaderRoute: typeof ApiPublicRecordProductionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -208,17 +229,8 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TvRoute: TvRoute,
+  ApiPublicRecordProductionRoute: ApiPublicRecordProductionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
