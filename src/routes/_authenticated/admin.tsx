@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser, useProductionEntries } from "@/hooks/useProduction";
 import { ALL_SHIFTS, SHIFTS, toDateStr, businessDate, type ProductionEntry, type ShiftNum } from "@/lib/production";
 import { toast } from "sonner";
+import { ProductionModeControl } from "@/components/dashboard/ProductionModeControl";
+import { useProductionMode } from "@/hooks/useProductionMode";
 import { ArrowLeft, LogOut, Plus, Pencil, Trash2, Save, X, Search, Filter, Loader2, ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -37,6 +39,7 @@ function AdminPanel() {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuthUser();
   const { entries, loading } = useProductionEntries();
+  const { mode } = useProductionMode();
   const [form, setForm] = useState<FormState>(newForm());
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
@@ -202,7 +205,7 @@ function AdminPanel() {
                 <X className="h-4 w-4" /> Cancel
               </button>
             )}
-            <button disabled={saving} className="btn-gold rounded-xl px-5 py-2.5 text-sm inline-flex items-center gap-2 disabled:opacity-60">
+            <button disabled={saving || mode === "AUTO"} className="btn-gold rounded-xl px-5 py-2.5 text-sm inline-flex items-center gap-2 disabled:opacity-60">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               {form.id ? "Update Entry" : "Save Entry"}
             </button>
