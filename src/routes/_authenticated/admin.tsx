@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser, useProductionEntries } from "@/hooks/useProduction";
 import { ALL_SHIFTS, SHIFTS, toDateStr, businessDate, type ProductionEntry, type ShiftNum } from "@/lib/production";
 import { toast } from "sonner";
+import { ProductionModeControl } from "@/components/dashboard/ProductionModeControl";
+import { useProductionMode } from "@/hooks/useProductionMode";
 import { ArrowLeft, LogOut, Plus, Pencil, Trash2, Save, X, Search, Filter, Loader2, ShieldAlert } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -37,6 +39,7 @@ function AdminPanel() {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuthUser();
   const { entries, loading } = useProductionEntries();
+  const { mode } = useProductionMode();
   const [form, setForm] = useState<FormState>(newForm());
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
@@ -163,10 +166,17 @@ function AdminPanel() {
         </div>
       </header>
 
+      <ProductionModeControl canManage={isAdmin} />
+
       <section className="glass-gold rounded-3xl p-5 sm:p-6 fade-up">
         <h2 className="display gold-text text-xl mb-4 flex items-center gap-2">
           {form.id ? <><Pencil className="h-5 w-5" /> Edit Entry</> : <><Plus className="h-5 w-5" /> New Entry</>}
         </h2>
+        {mode === "AUTO" && (
+          <div className="mb-4 rounded-2xl border border-[color:var(--cyan)] bg-[oklch(0.7_0.15_200/10%)] px-4 py-3 text-sm text-[color:var(--cyan)] font-bold">
+            System is in AUTO MODE — manual entry is disabled. Production is recorded automatically by the ESP32 device.
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
           <FormField label="Date" className="lg:col-span-1">
             <input type="date" required value={form.entry_date} onChange={(e) => setForm({ ...form, entry_date: e.target.value })} max={toDateStr(new Date())} className="input" />
@@ -195,7 +205,7 @@ function AdminPanel() {
                 <X className="h-4 w-4" /> Cancel
               </button>
             )}
-            <button disabled={saving} className="btn-gold rounded-xl px-5 py-2.5 text-sm inline-flex items-center gap-2 disabled:opacity-60">
+            <button disabled={saving || mode === "AUTO"} className="btn-gold rounded-xl px-5 py-2.5 text-sm inline-flex items-center gap-2 disabled:opacity-60">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               {form.id ? "Update Entry" : "Save Entry"}
             </button>

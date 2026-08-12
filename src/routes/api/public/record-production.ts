@@ -85,6 +85,17 @@ export const Route = createFileRoute('/api/public/record-production')({
           const { entry_date, shift, slot_index, time_slot } = resolveSlot();
 
           const { supabaseAdmin } = await import('@/integrations/supabase/client.server');
+
+          // Global production mode gate (also enforced inside the RPC / DB trigger).
+          const { data: mode, error: modeError } = await supabaseAdmin.rpc('production_mode');
+          if (modeError) {
+            console.error('[record-production] mode lookup failed', modeError.message);
+            return json({ success: false, error: 'Failed to record load' }, 500);
+          }
+          if (mode !== 'AUTO') {
+            return json({ success: false, error: 'Production system is in MANUAL mode' }, 403);
+          }
+
           const { data, error } = await supabaseAdmin.rpc('increment_production_load', {
             _entry_date: entry_date,
             _shift: shift,
