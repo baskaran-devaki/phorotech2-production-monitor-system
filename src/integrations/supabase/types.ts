@@ -161,6 +161,30 @@ export type Database = {
         }
         Relationships: []
       }
+      production_settings: {
+        Row: {
+          created_at: string
+          id: boolean
+          mode: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: boolean
+          mode?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: boolean
+          mode?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       security_settings: {
         Row: {
           created_at: string
@@ -266,6 +290,7 @@ export type Database = {
         }
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      production_mode: { Args: never; Returns: string }
     }
     Enums: {
       app_role: "admin" | "user"
