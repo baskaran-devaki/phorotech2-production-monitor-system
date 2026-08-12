@@ -163,10 +163,17 @@ function AdminPanel() {
         </div>
       </header>
 
+      <ProductionModeControl canManage={isAdmin} />
+
       <section className="glass-gold rounded-3xl p-5 sm:p-6 fade-up">
         <h2 className="display gold-text text-xl mb-4 flex items-center gap-2">
           {form.id ? <><Pencil className="h-5 w-5" /> Edit Entry</> : <><Plus className="h-5 w-5" /> New Entry</>}
         </h2>
+        {mode === "AUTO" && (
+          <div className="mb-4 rounded-2xl border border-[color:var(--cyan)] bg-[oklch(0.7_0.15_200/10%)] px-4 py-3 text-sm text-[color:var(--cyan)] font-bold">
+            System is in AUTO MODE — manual entry is disabled. Production is recorded automatically by the ESP32 device.
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">
           <FormField label="Date" className="lg:col-span-1">
             <input type="date" required value={form.entry_date} onChange={(e) => setForm({ ...form, entry_date: e.target.value })} max={toDateStr(new Date())} className="input" />
