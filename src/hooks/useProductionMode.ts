@@ -21,9 +21,19 @@ export function useProductionMode() {
   useEffect(() => {
     load();
     const channel = supabase
-      .channel("production_settings_changes")
-      .on("postgres_changes", { event: "*", schema: "public", table: "production_settings" }, () => load())
-      .subscribe();
+  .channel("production_settings_changes")
+  .on(
+    "postgres_changes",
+    {
+      event: "*",
+      schema: "public",
+      table: "production_settings",
+    },
+    () => {
+      // refresh mode
+    }
+  )
+  .subscribe();
     return () => {
       supabase.removeChannel(channel);
     };
