@@ -3,7 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type ProductionMode = "AUTO" | "MANUAL";
 
-/** Global, plant-wide production mode (persisted in the database, shared by all users/devices). */
+/**
+ * Global, plant-wide production mode.
+ * Persisted in the database and shared by all users/devices.
+ */
 export function useProductionMode() {
   const [mode, setMode] = useState<ProductionMode | null>(null);
   const [loading, setLoading] = useState(true);
@@ -13,44 +16,66 @@ export function useProductionMode() {
       .from("production_settings")
       .select("mode")
       .maybeSingle();
-    if (error) console.error(error);
-    setMode(((data?.mode as ProductionMode) ?? "MANUAL") as ProductionMode);
+
+    if (error) {
+      console.error("[production-mode] failed to load mode:", error);
+      setMode("MANUAL");
+    } else {
+      setMode((data?.mode as ProductionMode) ?? "MANUAL");
+    }
+
     setLoading(false);
   }, []);
 
   useEffect(() => {
     load();
-    const channel = supabase
-  .channel("production_settings_changes")
-  .on(
-    "postgres_changes",
-    {
-      event: "*",
-      schema: "public",
-      table: "production_settings",
-    },
-    () => {
-      // refresh mode
-    }
-  )
-  .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, [load]);
 
-  /** Only admins/super admins pass the database policy; others get an error. */
-  const setProductionMode = useCallback(async (next: ProductionMode) => {
-    const { data: userRes } = await supabase.auth.getUser();
-    const { data, error } = await supabase
-      .from("production_settings")
-      .update({ mode: next, updated_by: userRes.user?.id ?? null })
-      .eq("id", true)
-      .select("mode");
-    if (error) throw error;
-    if (!data || data.length === 0) throw new Error("Not authorized to change production mode");
-    setMode(next);
-  }, []);
+  /**
+   * Only authorized admins/super admins should be able
+   * to change production mode through the database policy.
+   */
+  const setProductionMode = useCallback(
+    async (next: ProductionMode) => {
+      const { data: userRes, error: userError } =
+        await supabase.auth.getUser();
 
-  return { mode, loading, setProductionMode, refresh: load };
+      if (userError || !userRes.user) {
+        throw new Error("You must be logged in to change production mode");
+      }
+
+      const { data, error } = await supabase
+        .from("production_settings")
+        .update({
+          mode: next,
+          updated_by: userRes.user.id,
+        })
+        .eq("id", true)
+        .select("mode");
+
+      if (error) {
+        console.error(
+          "[production-mode] failed to update mode:",
+          error
+        );
+        throw error;
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error(
+          "Not authorized to change production mode"
+        );
+      }
+
+      setMode(next);
+    },
+    []
+  );
+
+  return {
+    mode,
+    loading,
+    setProductionMode,
+    refresh: load,
+  };
 }
