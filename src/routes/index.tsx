@@ -78,7 +78,6 @@ function Dashboard() {
       <ReportDialog
         open={reportOpen}
         onOpenChange={setReportOpen}
-        entries={entries}
         generatedBy={user?.email ?? "Guest"}
       />
 

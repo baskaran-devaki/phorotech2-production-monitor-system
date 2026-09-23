@@ -22,12 +22,10 @@ import { ReportView } from "./ReportView";
 export function ReportDialog({
   open,
   onOpenChange,
-  entries,
   generatedBy,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  entries: ProductionEntry[];
   generatedBy: string;
 }) {
   const [withHourly, setWithHourly] = useState<"with" | "without">("without");
