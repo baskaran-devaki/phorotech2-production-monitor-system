@@ -64,7 +64,7 @@ export function ReportDialog({
     if (!p) return;
     setBusy("pdf");
     try {
-      await generateReportPDF(await fetchReport(p), withHourly === "with", generatedBy);
+      await generateReportPDF(await fetchReport(p), withHourly === "with");
       toast.success("PDF downloaded");
     } catch (e) {
       console.error(e);

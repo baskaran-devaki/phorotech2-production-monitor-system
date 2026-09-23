@@ -38,7 +38,6 @@ async function loadLogo(): Promise<string | null> {
 export async function generateReportPDF(
   report: ReportData,
   withHourly: boolean,
-  generatedBy: string,
 ) {
   const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
   const pageW = doc.internal.pageSize.getWidth();
