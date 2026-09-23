@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { ProductionEntry } from "@/lib/production";
+import { fetchAllProductionEntries } from "@/lib/production-data";
 
 export function useProductionEntries() {
   const [entries, setEntries] = useState<ProductionEntry[]>([]);
@@ -12,17 +13,16 @@ export function useProductionEntries() {
     let mounted = true;
 
     async function load() {
-      const { data, error } = await supabase
-        .from("production_entries")
-        .select("*")
-        .order("entry_date", { ascending: false })
-        .order("shift", { ascending: true })
-        .order("slot_index", { ascending: true });
-      if (!mounted) return;
-      if (error) console.error(error);
-      setEntries((data ?? []) as ProductionEntry[]);
-      setLastUpdated(new Date());
-      setLoading(false);
+      try {
+        const data = await fetchAllProductionEntries();
+        if (!mounted) return;
+        setEntries(data);
+        setLastUpdated(new Date());
+      } catch (error) {
+        console.error(error);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     }
     load();
 

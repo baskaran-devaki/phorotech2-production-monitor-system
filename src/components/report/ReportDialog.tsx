@@ -16,6 +16,7 @@ import { currentMonthKey, monthNameFromKey } from "@/lib/production";
 import { buildReport, monthOptions, monthRange } from "@/lib/report";
 import { generateReportPDF } from "@/lib/report-pdf";
 import { generateReportExcel } from "@/lib/report-excel";
+import { fetchAllProductionEntries } from "@/lib/production-data";
 import { ReportView } from "./ReportView";
 
 export function ReportDialog({
@@ -34,8 +35,9 @@ export function ReportDialog({
   const [month, setMonth] = useState(currentMonthKey());
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const [busy, setBusy] = useState<null | "pdf" | "excel">(null);
+  const [busy, setBusy] = useState<null | "view" | "pdf" | "excel">(null);
   const [viewing, setViewing] = useState(false);
+  const [viewReport, setViewReport] = useState<ReturnType<typeof buildReport> | null>(null);
 
   const months = useMemo(() => monthOptions(), []);
 
@@ -55,22 +57,17 @@ export function ReportDialog({
     return { from, to, label: `${from} to ${to}` };
   }
 
-  const report = useMemo(() => {
-    const p = periodMode === "month" ? { ...monthRange(month), label: monthNameFromKey(month) } : from && to ? { from, to, label: `${from} to ${to}` } : null;
-    if (!p) return null;
-    return buildReport(entries, p.from, p.to, p.label);
-  }, [entries, periodMode, month, from, to]);
+  async function fetchReport(p: { from: string; to: string; label: string }) {
+    const periodEntries = await fetchAllProductionEntries({ from: p.from, to: p.to });
+    return buildReport(periodEntries, p.from, p.to, p.label);
+  }
 
   async function handlePdf() {
     const p = resolvePeriod();
     if (!p) return;
     setBusy("pdf");
     try {
-      await generateReportPDF(
-        buildReport(entries, p.from, p.to, p.label),
-        withHourly === "with",
-        generatedBy,
-      );
+      await generateReportPDF(await fetchReport(p), withHourly === "with", generatedBy);
       toast.success("PDF downloaded");
     } catch (e) {
       console.error(e);
@@ -85,11 +82,7 @@ export function ReportDialog({
     if (!p) return;
     setBusy("excel");
     try {
-      await generateReportExcel(
-        buildReport(entries, p.from, p.to, p.label),
-        withHourly === "with",
-        generatedBy,
-      );
+      await generateReportExcel(await fetchReport(p), withHourly === "with", generatedBy);
       toast.success("Excel downloaded");
     } catch (e) {
       console.error(e);
@@ -99,11 +92,20 @@ export function ReportDialog({
     }
   }
 
-  function handleView() {
+  async function handleView() {
     const p = resolvePeriod();
     if (!p) return;
-    setViewing(true);
-    onOpenChange(false);
+    setBusy("view");
+    try {
+      setViewReport(await fetchReport(p));
+      setViewing(true);
+      onOpenChange(false);
+    } catch (e) {
+      console.error(e);
+      toast.error("Could not load the complete report");
+    } finally {
+      setBusy(null);
+    }
   }
 
   return (
@@ -199,9 +201,10 @@ export function ReportDialog({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <button
                 onClick={handleView}
+                disabled={busy !== null}
                 className="rounded-xl border border-[color:var(--border)] px-3 py-2 text-sm inline-flex items-center justify-center gap-2 hover:bg-[oklch(0.78_0.14_82/10%)] transition"
               >
-                <Eye className="h-4 w-4" /> View Report
+                {busy === "view" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />} View Report
               </button>
               <button
                 onClick={handleExcel}
@@ -232,9 +235,9 @@ export function ReportDialog({
         </DialogContent>
       </Dialog>
 
-      {viewing && report && (
+      {viewing && viewReport && (
         <ReportView
-          report={report}
+          report={viewReport}
           withHourly={withHourly === "with"}
           generatedBy={generatedBy}
           onClose={() => setViewing(false)}
