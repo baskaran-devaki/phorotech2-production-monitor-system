@@ -11,7 +11,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Download, Eye, FileSpreadsheet, Loader2 } from "lucide-react";
-import type { ProductionEntry } from "@/lib/production";
 import { currentMonthKey, monthNameFromKey } from "@/lib/production";
 import { buildReport, monthOptions, monthRange } from "@/lib/report";
 import { generateReportPDF } from "@/lib/report-pdf";

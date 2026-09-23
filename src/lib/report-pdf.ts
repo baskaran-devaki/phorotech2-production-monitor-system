@@ -150,7 +150,6 @@ export async function generateReportPDF(
   // Production trend bar chart
   const chartH = 150;
   if (y + chartH > pageH - 60) {
-    drawFooter();
     doc.addPage();
     drawHeader();
     y = 100;
@@ -190,8 +189,6 @@ export async function generateReportPDF(
       doc.text(t.date.slice(8), bx + barW / 2, baseY + 9, { align: "center" });
     }
   });
-  drawFooter();
-
   // ---------- DETAIL PAGES ----------
   const detailStart = () => {
     doc.addPage();
@@ -269,7 +266,7 @@ export async function generateReportPDF(
   }
 
   const total = doc.getNumberOfPages();
-  for (let i = 2; i <= total; i++) {
+  for (let i = 1; i <= total; i++) {
     doc.setPage(i);
     drawFooter();
   }
