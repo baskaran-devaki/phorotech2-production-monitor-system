@@ -1,6 +1,9 @@
-# Critical historical data fix
+# PPMS upgrade brief
 
-- [x] Add complete paginated production reads
-- [x] Make report preview/PDF/Excel fetch the selected period directly
-- [x] Make PDF white and printer-friendly with the exact footer
-- [x] Verify July 2026 totals, Dashboard/TV data, and rendered PDF
+- [ ] Preserve production history, reports, shifts, and TV Mode while adding new modules
+- [ ] Add email-based user profiles, assigned departments, and Super Admin-controlled permissions
+- [ ] Add maintenance team, downtime workflow, attendance, history, and analytics
+- [ ] Add secure maintenance photo uploads and audit important changes
+- [ ] Apply printer-friendly production/downtime reports and validate exports
+- [ ] Keep production history for 10 years; archive/verify before any removal (no automatic deletion until recovery is proven)
+- [ ] Validate desktop, TV, Android-sized web screens, authorization, and historical data
