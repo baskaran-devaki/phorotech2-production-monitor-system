@@ -7,3 +7,5 @@
 - [ ] Apply printer-friendly production/downtime reports and validate exports
 - [ ] Keep production history for 10 years; archive/verify before any removal (no automatic deletion until recovery is proven)
 - [ ] Validate desktop, TV, Android-sized web screens, authorization, and historical data
+
+Baseline before upgrade: 1,827 production rows; current production month totals must remain unchanged.
