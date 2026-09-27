@@ -77,6 +77,153 @@ export type Database = {
         }
         Relationships: []
       }
+      downtime_attendance: {
+        Row: {
+          created_at: string
+          created_by: string
+          designation_snapshot: string
+          downtime_id: string
+          employee_id_snapshot: string | null
+          employee_name_snapshot: string
+          id: string
+          maintenance_member_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          designation_snapshot: string
+          downtime_id: string
+          employee_id_snapshot?: string | null
+          employee_name_snapshot: string
+          id?: string
+          maintenance_member_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          designation_snapshot?: string
+          downtime_id?: string
+          employee_id_snapshot?: string | null
+          employee_name_snapshot?: string
+          id?: string
+          maintenance_member_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "downtime_attendance_downtime_id_fkey"
+            columns: ["downtime_id"]
+            isOneToOne: false
+            referencedRelation: "downtime_records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "downtime_attendance_maintenance_member_id_fkey"
+            columns: ["maintenance_member_id"]
+            isOneToOne: false
+            referencedRelation: "maintenance_team"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      downtime_records: {
+        Row: {
+          action_taken: string | null
+          after_photo_path: string | null
+          before_photo_path: string | null
+          business_date: string
+          created_at: string
+          created_by: string
+          description: string | null
+          end_time: string | null
+          id: string
+          machine_process: string
+          parts_material_used: string | null
+          reason: string
+          reason_category: Database["public"]["Enums"]["downtime_reason_category"]
+          shift: number
+          start_time: string
+          status: Database["public"]["Enums"]["downtime_status"]
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          action_taken?: string | null
+          after_photo_path?: string | null
+          before_photo_path?: string | null
+          business_date: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          machine_process: string
+          parts_material_used?: string | null
+          reason: string
+          reason_category: Database["public"]["Enums"]["downtime_reason_category"]
+          shift: number
+          start_time: string
+          status?: Database["public"]["Enums"]["downtime_status"]
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          action_taken?: string | null
+          after_photo_path?: string | null
+          before_photo_path?: string | null
+          business_date?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          machine_process?: string
+          parts_material_used?: string | null
+          reason?: string
+          reason_category?: Database["public"]["Enums"]["downtime_reason_category"]
+          shift?: number
+          start_time?: string
+          status?: Database["public"]["Enums"]["downtime_status"]
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: []
+      }
+      maintenance_team: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          designation: string
+          employee_id: string | null
+          employee_name: string
+          id: string
+          is_active: boolean
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          designation: string
+          employee_id?: string | null
+          employee_name: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          designation?: string
+          employee_id?: string | null
+          employee_name?: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       plant_head: {
         Row: {
           created_at: string
@@ -185,6 +332,72 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          department: Database["public"]["Enums"]["user_department"]
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          department: Database["public"]["Enums"]["user_department"]
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          department?: Database["public"]["Enums"]["user_department"]
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      retention_archive_runs: {
+        Row: {
+          affected_year: number
+          archive_location: string | null
+          archive_status: string
+          completed_at: string | null
+          created_at: string
+          downtime_record_count: number
+          executed_by: string
+          id: string
+          operation_result: string
+          production_record_count: number
+          verified_at: string | null
+        }
+        Insert: {
+          affected_year: number
+          archive_location?: string | null
+          archive_status?: string
+          completed_at?: string | null
+          created_at?: string
+          downtime_record_count?: number
+          executed_by: string
+          id?: string
+          operation_result?: string
+          production_record_count?: number
+          verified_at?: string | null
+        }
+        Update: {
+          affected_year?: number
+          archive_location?: string | null
+          archive_status?: string
+          completed_at?: string | null
+          created_at?: string
+          downtime_record_count?: number
+          executed_by?: string
+          id?: string
+          operation_result?: string
+          production_record_count?: number
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       security_settings: {
         Row: {
           created_at: string
@@ -226,6 +439,30 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_permissions: {
+        Row: {
+          created_at: string
+          granted_by: string | null
+          id: string
+          permission: Database["public"]["Enums"]["permission_key"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          permission: Database["public"]["Enums"]["permission_key"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          permission?: Database["public"]["Enums"]["permission_key"]
           user_id?: string
         }
         Relationships: []
@@ -291,9 +528,41 @@ export type Database = {
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       production_mode: { Args: never; Returns: string }
+      user_has_permission: {
+        Args: {
+          _permission: Database["public"]["Enums"]["permission_key"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "user"
+      downtime_reason_category:
+        | "mechanical"
+        | "electrical"
+        | "automation"
+        | "material"
+        | "process"
+        | "other"
+      downtime_status:
+        | "open"
+        | "under_maintenance"
+        | "testing"
+        | "resolved"
+        | "closed"
+      permission_key:
+        | "dashboard_view"
+        | "production_view"
+        | "production_entry"
+        | "downtime_view"
+        | "downtime_entry"
+        | "downtime_close"
+        | "reports"
+        | "analytics"
+        | "tv_mode"
+        | "notifications"
+      user_department: "production" | "maintenance" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -422,6 +691,34 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      downtime_reason_category: [
+        "mechanical",
+        "electrical",
+        "automation",
+        "material",
+        "process",
+        "other",
+      ],
+      downtime_status: [
+        "open",
+        "under_maintenance",
+        "testing",
+        "resolved",
+        "closed",
+      ],
+      permission_key: [
+        "dashboard_view",
+        "production_view",
+        "production_entry",
+        "downtime_view",
+        "downtime_entry",
+        "downtime_close",
+        "reports",
+        "analytics",
+        "tv_mode",
+        "notifications",
+      ],
+      user_department: ["production", "maintenance", "admin"],
     },
   },
 } as const
