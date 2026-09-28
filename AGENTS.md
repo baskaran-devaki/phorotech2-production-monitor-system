@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep production and downtime authorization in database RLS/helpers; UI permission checks only control visibility because direct requests must remain protected.
+- Preserve maintenance attendance snapshots even when a team member is deactivated, because historical reports must retain the original identity and designation.
