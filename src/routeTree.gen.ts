@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSuperRouteImport } from './routes/_authenticated/super'
+import { Route as AuthenticatedDowntimeRouteImport } from './routes/_authenticated/downtime'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiPublicRecordProductionRouteImport } from './routes/api/public/record-production'
 
@@ -53,6 +54,11 @@ const AuthenticatedSuperRoute = AuthenticatedSuperRouteImport.update({
   path: '/super',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDowntimeRoute = AuthenticatedDowntimeRouteImport.update({
+  id: '/downtime',
+  path: '/downtime',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tv': typeof TvRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/downtime': typeof AuthenticatedDowntimeRoute
   '/super': typeof AuthenticatedSuperRoute
   '/api/public/record-production': typeof ApiPublicRecordProductionRoute
 }
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tv': typeof TvRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/downtime': typeof AuthenticatedDowntimeRoute
   '/super': typeof AuthenticatedSuperRoute
   '/api/public/record-production': typeof ApiPublicRecordProductionRoute
 }
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tv': typeof TvRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/downtime': typeof AuthenticatedDowntimeRoute
   '/_authenticated/super': typeof AuthenticatedSuperRoute
   '/api/public/record-production': typeof ApiPublicRecordProductionRoute
 }
@@ -106,6 +115,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/tv'
     | '/admin'
+    | '/downtime'
     | '/super'
     | '/api/public/record-production'
   fileRoutesByTo: FileRoutesByTo
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/tv'
     | '/admin'
+    | '/downtime'
     | '/super'
     | '/api/public/record-production'
   id:
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/tv'
     | '/_authenticated/admin'
+    | '/_authenticated/downtime'
     | '/_authenticated/super'
     | '/api/public/record-production'
   fileRoutesById: FileRoutesById
@@ -192,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSuperRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/downtime': {
+      id: '/_authenticated/downtime'
+      path: '/downtime'
+      fullPath: '/downtime'
+      preLoaderRoute: typeof AuthenticatedDowntimeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -211,11 +230,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedDowntimeRoute: typeof AuthenticatedDowntimeRoute
   AuthenticatedSuperRoute: typeof AuthenticatedSuperRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedDowntimeRoute: AuthenticatedDowntimeRoute,
   AuthenticatedSuperRoute: AuthenticatedSuperRoute,
 }
 
