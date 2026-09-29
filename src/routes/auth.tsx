@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Factory, Loader2, Mail, KeyRound, ArrowLeft } from "lucide-react";
+import { Loader2, Mail, KeyRound, ArrowLeft } from "lucide-react";
+import logoAsset from "@/assets/phorotech-logo.jpg.asset.json";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -32,7 +33,7 @@ function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Signed in");
-        navigate({ to: "/admin" });
+        navigate({ to: "/" });
       } else if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
           email, password,
@@ -64,10 +65,8 @@ function AuthPage() {
         </Link>
         <div className="glass-gold rounded-3xl p-6 sm:p-8 gold-glow">
           <div className="flex flex-col items-center text-center">
-            <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-[oklch(0.88_0.16_90)] to-[oklch(0.58_0.12_70)]">
-              <Factory className="h-7 w-7 text-[oklch(0.12_0.005_60)]" />
-            </div>
-            <h1 className="display gold-text text-2xl sm:text-3xl mt-3">Admin Portal</h1>
+            <img src={logoAsset.url} alt="Phorotech Surfin India" className="h-16 w-16 rounded-md object-contain bg-background" />
+            <h1 className="display gold-text text-2xl sm:text-3xl mt-3">PPMS Sign In</h1>
             <p className="text-xs text-[color:var(--muted-foreground)] mt-1">Phorotech · ED Plant · Irungattukottai</p>
           </div>
 
@@ -88,7 +87,7 @@ function AuthPage() {
 
             <button disabled={loading} className="btn-gold w-full rounded-xl py-3 text-sm inline-flex items-center justify-center gap-2 disabled:opacity-60">
               {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {mode === "signin" ? "Sign In" : mode === "signup" ? "Create Admin Account" : "Send Reset Link"}
+              {mode === "signin" ? "Sign In" : mode === "signup" ? "Create Account" : "Send Reset Link"}
             </button>
           </form>
 

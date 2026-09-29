@@ -174,7 +174,7 @@ function AdminPanel() {
         </h2>
         {mode === "AUTO" && (
           <div className="mb-4 rounded-2xl border border-[color:var(--cyan)] bg-[oklch(0.7_0.15_200/10%)] px-4 py-3 text-sm text-[color:var(--cyan)] font-bold">
-            System is in AUTO MODE — manual entry is disabled. Production is recorded automatically by the ESP32 device.
+            System is in AUTO MODE — manual entry is disabled. Production is recorded automatically through the network.
           </div>
         )}
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-3">

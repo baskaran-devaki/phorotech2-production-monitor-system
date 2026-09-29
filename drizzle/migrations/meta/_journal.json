@@ -8,6 +8,13 @@
       "when": 1790467774030,
       "tag": "0000_add_ppms_identity_permissions_and_downtime",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790641266471,
+      "tag": "0001_enforce_department_and_downtime_integrity",
+      "breakpoints": true
     }
   ]
 }

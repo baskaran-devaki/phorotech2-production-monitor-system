@@ -4,9 +4,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/hooks/useProduction";
 import { toast } from "sonner";
-import { ArrowLeft, LogOut, Loader2, ShieldAlert, UserPlus, Ban, Trash2, ShieldCheck, Shield, Save, Crown, Mail, KeyRound, Smartphone, LifeBuoy, Eye, EyeOff, CheckCircle2, AlertTriangle, Lock } from "lucide-react";
+import { ArrowLeft, LogOut, Loader2, ShieldAlert, UserPlus, Ban, Trash2, ShieldCheck, Shield, Save, Crown, Mail, KeyRound, Smartphone, LifeBuoy, Eye, EyeOff, CheckCircle2, AlertTriangle, Lock, Wrench } from "lucide-react";
 import {
-  listAdminUsers, inviteAdmin, setUserDisabled, deleteAdmin, setAdminRole,
+  listAdminUsers, inviteAdmin, setUserDisabled, deleteAdmin, setAdminRole, updateUserAccess,
 } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/_authenticated/super")({
@@ -15,7 +15,10 @@ export const Route = createFileRoute("/_authenticated/super")({
 });
 
 type Tab = "admins" | "plant" | "security" | "audit";
-type AdminUser = { id: string; email: string; created_at: string; last_sign_in_at: string | null; banned_until: string | null; roles: string[]; is_super_admin: boolean };
+type AdminUser = { id: string; email: string; created_at: string; last_sign_in_at: string | null; banned_until: string | null; roles: string[]; is_super_admin: boolean; username: string; department: "production" | "maintenance" | "admin" | null; permissions: string[] };
+const ACCESS_OPTIONS = ["dashboard_view", "production_view", "production_entry", "downtime_view", "downtime_entry", "downtime_close", "reports", "analytics", "tv_mode", "notifications"] as const;
+type AccessOption = typeof ACCESS_OPTIONS[number];
+type Department = "production" | "maintenance" | "admin";
 
 function SuperAdminPanel() {
   const navigate = useNavigate();
@@ -48,6 +51,7 @@ function SuperAdminPanel() {
         </div>
         <div className="flex items-center gap-2">
           <Link to="/admin" className="rounded-xl px-3 py-2 text-xs sm:text-sm border border-[color:var(--border)] inline-flex items-center gap-2 hover:bg-[oklch(0.78_0.14_82/10%)] transition"><Shield className="h-4 w-4" /><span className="hidden sm:inline">Admin</span></Link>
+          <Link to="/downtime" className="rounded-xl px-3 py-2 text-xs sm:text-sm border border-[color:var(--border)] inline-flex items-center gap-2 hover:bg-[oklch(0.78_0.14_82/10%)] transition"><Wrench className="h-4 w-4" /><span className="hidden sm:inline">Downtime</span></Link>
           <Link to="/" className="rounded-xl px-3 py-2 text-xs sm:text-sm border border-[color:var(--border)] inline-flex items-center gap-2 hover:bg-[oklch(0.78_0.14_82/10%)] transition"><ArrowLeft className="h-4 w-4" /><span className="hidden sm:inline">Dashboard</span></Link>
           <button onClick={signOut} className="btn-gold rounded-xl px-3 py-2 text-xs sm:text-sm inline-flex items-center gap-2"><LogOut className="h-4 w-4" /><span className="hidden sm:inline">Sign Out</span></button>
         </div>
@@ -76,8 +80,13 @@ function AdminsTab({ currentUserId }: { currentUserId: string }) {
   const disable = useServerFn(setUserDisabled);
   const del = useServerFn(deleteAdmin);
   const setRole = useServerFn(setAdminRole);
+  const saveAccess = useServerFn(updateUserAccess);
   const [users, setUsers] = useState<AdminUser[] | null>(null);
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [department, setDepartment] = useState<Department>("production");
+  const [permissions, setPermissions] = useState<AccessOption[]>(["dashboard_view", "production_view"]);
+  const [editing, setEditing] = useState<AdminUser | null>(null);
   const [busy, setBusy] = useState(false);
 
   const refresh = useCallback(async () => {
@@ -89,7 +98,7 @@ function AdminsTab({ currentUserId }: { currentUserId: string }) {
 
   async function handleInvite(e: React.FormEvent) {
     e.preventDefault(); setBusy(true);
-    try { await invite({ data: { email } }); toast.success("Invitation sent"); setEmail(""); await refresh(); }
+    try { await invite({ data: { email, username, department, permissions } }); toast.success("Invitation sent"); setEmail(""); setUsername(""); await refresh(); }
     catch (err) { toast.error((err as Error).message); } finally { setBusy(false); }
   }
   async function toggleDisabled(u: AdminUser) {
@@ -107,22 +116,35 @@ function AdminsTab({ currentUserId }: { currentUserId: string }) {
     try { await setRole({ data: { userId: u.id, makeAdmin: !isA } }); toast.success(!isA ? "Granted admin" : "Revoked admin"); await refresh(); }
     catch (err) { toast.error((err as Error).message); }
   }
+  async function handleAccessSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editing) return;
+    setBusy(true);
+    try { await saveAccess({ data: { userId: editing.id, username, department, permissions } }); toast.success("Access updated"); setEditing(null); await refresh(); }
+    catch (err) { toast.error((err as Error).message); } finally { setBusy(false); }
+  }
+  function beginEdit(u: AdminUser) { setEditing(u); setEmail(u.email); setUsername(u.username || u.email.split("@")[0]); setDepartment(u.department ?? "production"); setPermissions(u.permissions as AccessOption[]); }
+  function togglePermission(value: AccessOption) { setPermissions((current) => current.includes(value) ? current.filter((item) => item !== value) : [...current, value]); }
 
   return (
     <>
       <section className="glass-gold rounded-3xl p-5 sm:p-6 fade-up">
-        <h2 className="display gold-text text-xl mb-4 inline-flex items-center gap-2"><UserPlus className="h-5 w-5" /> Invite Admin</h2>
-        <form onSubmit={handleInvite} className="flex flex-wrap items-end gap-3">
+        <h2 className="display gold-text text-xl mb-4 inline-flex items-center gap-2"><UserPlus className="h-5 w-5" /> {editing ? "Edit Account" : "Invite User"}</h2>
+        <form onSubmit={editing ? handleAccessSave : handleInvite} className="flex flex-wrap items-end gap-3">
           <label className="flex-1 min-w-[240px]">
             <div className="text-[10px] uppercase tracking-widest text-[color:var(--gold-light)] mb-1.5">Email</div>
-            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="new-admin@company.com"
+            <input type="email" required disabled={!!editing} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="team@company.com"
               className="w-full bg-[oklch(0.14_0.005_60/60%)] border border-[color:var(--border)] rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[color:var(--gold)]" />
           </label>
+          <label className="flex-1 min-w-[180px]"><div className="text-[10px] uppercase tracking-widest text-[color:var(--gold-light)] mb-1.5">Username</div><input required minLength={2} maxLength={60} value={username} onChange={(e) => setUsername(e.target.value)} className="input w-full" /></label>
+          <label className="min-w-[170px]"><div className="text-[10px] uppercase tracking-widest text-[color:var(--gold-light)] mb-1.5">Department</div><select value={department} onChange={(e) => setDepartment(e.target.value as Department)} className="input w-full"><option value="production">Production</option><option value="maintenance">Maintenance</option><option value="admin">Admin</option></select></label>
+          <fieldset className="w-full"><legend className="text-xs text-[color:var(--gold-light)] mb-2">Permissions</legend><div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">{ACCESS_OPTIONS.map((permission) => <label key={permission} className="flex items-center gap-2 text-xs border border-[color:var(--border)] p-2 rounded"><input type="checkbox" checked={permissions.includes(permission)} onChange={() => togglePermission(permission)} />{permission.replaceAll("_", " ")}</label>)}</div></fieldset>
           <button disabled={busy} className="btn-gold rounded-xl px-5 py-2.5 text-sm inline-flex items-center gap-2 disabled:opacity-60">
-            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />} Send Invite
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : editing ? <Save className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />} {editing ? "Save Access" : "Send Invite"}
           </button>
+          {editing && <button type="button" onClick={() => { setEditing(null); setEmail(""); setUsername(""); }} className="text-sm border border-[color:var(--border)] rounded px-4 py-2">Cancel</button>}
         </form>
-        <p className="text-xs text-[color:var(--muted-foreground)] mt-2">The user receives an email link. On signup they are granted Admin access automatically.</p>
+        <p className="text-xs text-[color:var(--muted-foreground)] mt-2">Invitees receive an email link. Department and permissions are assigned here, not at sign-in.</p>
       </section>
 
       <section className="glass-gold rounded-3xl p-5 sm:p-6 fade-up">
@@ -130,7 +152,7 @@ function AdminsTab({ currentUserId }: { currentUserId: string }) {
         <div className="overflow-x-auto rounded-2xl border border-[oklch(0.78_0.14_82/20%)]">
           <table className="min-w-full text-sm">
             <thead className="bg-[oklch(0.20_0.02_80/60%)] text-[color:var(--gold-light)] uppercase text-[10px] tracking-widest">
-              <tr><th className="px-3 py-2.5 text-left">Email</th><th className="px-3 py-2.5 text-left">Role</th><th className="px-3 py-2.5 text-left">Status</th><th className="px-3 py-2.5 text-left">Last Sign-in</th><th className="px-3 py-2.5 text-right">Actions</th></tr>
+              <tr><th className="px-3 py-2.5 text-left">Account</th><th className="px-3 py-2.5 text-left">Department / Role</th><th className="px-3 py-2.5 text-left">Status</th><th className="px-3 py-2.5 text-left">Last Sign-in</th><th className="px-3 py-2.5 text-right">Actions</th></tr>
             </thead>
             <tbody>
               {!users && <tr><td colSpan={5} className="p-6 text-center text-[color:var(--muted-foreground)]"><Loader2 className="h-4 w-4 animate-spin inline" /></td></tr>}
@@ -139,16 +161,18 @@ function AdminsTab({ currentUserId }: { currentUserId: string }) {
                 const isMe = u.id === currentUserId;
                 return (
                   <tr key={u.id} className="border-t border-[oklch(0.78_0.14_82/15%)]">
-                    <td className="px-3 py-2.5">{u.email} {isMe && <span className="text-[10px] text-[color:var(--gold-light)]">(you)</span>}</td>
+                    <td className="px-3 py-2.5"><strong>{u.username || "—"}</strong><div className="text-xs text-[color:var(--muted-foreground)]">{u.email} {isMe && "(you)"}</div></td>
                     <td className="px-3 py-2.5">
                       {u.is_super_admin ? <span className="inline-flex items-center gap-1 text-[color:var(--gold-light)] font-bold"><Crown className="h-3 w-3" /> Super Admin</span>
                         : u.roles.includes("admin") ? <span className="text-[color:var(--gold)]">Admin</span>
                         : <span className="text-[color:var(--muted-foreground)]">User</span>}
+                      <div className="text-xs capitalize text-[color:var(--muted-foreground)]">{u.department ?? "Unassigned"}</div>
                     </td>
                     <td className="px-3 py-2.5">{disabled ? <span className="text-destructive">Disabled</span> : <span className="text-[color:var(--success,oklch(0.72_0.18_145))]">Active</span>}</td>
                     <td className="px-3 py-2.5 text-xs text-[color:var(--muted-foreground)]">{u.last_sign_in_at ? new Date(u.last_sign_in_at).toLocaleString() : "—"}</td>
                     <td className="px-3 py-2.5 text-right">
                       <div className="inline-flex gap-1">
+                        {!u.is_super_admin && <button onClick={() => beginEdit(u)} title="Edit department and permissions" className="rounded-lg p-1.5 hover:bg-[oklch(0.78_0.14_82/20%)]"><Save className="h-4 w-4" /></button>}
                         {!u.is_super_admin && (
                           <button onClick={() => toggleRole(u)} title={u.roles.includes("admin") ? "Revoke admin" : "Grant admin"} className="rounded-lg p-1.5 hover:bg-[oklch(0.78_0.14_82/20%)]">
                             {u.roles.includes("admin") ? <Shield className="h-4 w-4" /> : <ShieldCheck className="h-4 w-4" />}

@@ -45,7 +45,7 @@ export function ProductionModeControl({ canManage }: { canManage: boolean }) {
         <div className="min-w-0">
           <h2 className="display gold-text text-xl">Production Mode</h2>
           <p className="text-xs text-[color:var(--muted-foreground)] mt-1">
-            Plant-wide setting. AUTO = ESP32 IoT updates only. MANUAL = admin entry only.
+            Plant-wide setting. AUTO = network updates only. MANUAL = admin entry only.
           </p>
         </div>
         {loading ? <Loader2 className="h-5 w-5 animate-spin text-[color:var(--gold)]" /> : <ProductionModeBadge mode={mode} />}
@@ -79,8 +79,8 @@ export function ProductionModeControl({ canManage }: { canManage: boolean }) {
                 <h3 className="display gold-text text-lg">Switch to {confirming} MODE?</h3>
                 <p className="text-sm text-[color:var(--muted-foreground)] mt-2">
                   {confirming === "AUTO"
-                    ? "Manual production entry will be disabled for all admins, and ESP32 automatic updates will become active."
-                    : "ESP32 automatic updates will be disabled, and manual production entry will become active for admins."}
+                     ? "Manual production entry will be disabled for all admins, and network updates will become active."
+                     : "Network updates will be disabled, and manual production entry will become active for admins."}
                 </p>
               </div>
             </div>
