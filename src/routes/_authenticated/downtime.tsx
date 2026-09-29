@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ArrowLeft, Activity, History, Plus, Users, BarChart3, FileDown, RefreshCw, Camera, Loader2 } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
+import { exportDowntimePDF, exportDowntimeExcel } from "@/lib/downtime-export";
 
 export const Route = createFileRoute("/_authenticated/downtime")({
   head: () => ({ meta: [
@@ -83,6 +84,13 @@ function DowntimePage() {
   const completed = filtered.filter((record) => record.status === "closed");
   const totalMinutes = filtered.reduce((total, record) => total + downtimeMinutes(record, now), 0);
   const avgMinutes = filtered.length ? Math.round(totalMinutes / filtered.length) : 0;
+  const [exporting, setExporting] = useState(false);
+  async function exportReport(format: "pdf" | "excel") {
+    setExporting(true);
+    try { const period = `${from || "All dates"} — ${to || "Present"}`; if (format === "pdf") await exportDowntimePDF(filtered, period); else await exportDowntimeExcel(filtered, period); }
+    catch (error) { toast.error((error as Error).message); }
+    finally { setExporting(false); }
+  }
 
   if (user === undefined || access.loading) return <main className="min-h-screen grid place-items-center"><Loader2 className="animate-spin text-primary" /></main>;
   if (!canView) return <main className="mx-auto max-w-4xl px-4 py-12"><h1 className="display gold-text text-2xl">Access restricted</h1><p className="mt-3 text-muted-foreground">Contact your Super Admin to request Downtime access.</p><Link to="/" className="mt-6 inline-block text-primary">Back to dashboard</Link></main>;
@@ -108,6 +116,7 @@ function DowntimePage() {
       <label className="text-xs text-muted-foreground">To<input type="date" className="input mt-1 block" value={to} min={from} onChange={(e) => setTo(e.target.value)} /></label>
       <label className="text-xs text-muted-foreground">Status<select className="input mt-1 block" value={status} onChange={(e) => setStatus(e.target.value)}><option value="all">All statuses</option>{DOWNTIME_STATUSES.map(({ value, label }) => <option value={value} key={value}>{label}</option>)}</select></label>
       {(from || to || status !== "all") && <Button variant="ghost" onClick={() => { setFrom(""); setTo(""); setStatus("all"); }}>Clear</Button>}
+      {(view === "history" || view === "analytics") && <div className="flex gap-2"><Button variant="outline" disabled={exporting} onClick={() => void exportReport("pdf")}><FileDown />PDF</Button><Button variant="outline" disabled={exporting} onClick={() => void exportReport("excel")}><FileDown />Excel</Button></div>}
     </div>}
     {view === "active" && <RecordList records={active} attendance={attendance} now={now} canEntry={canEntry} canClose={canClose} onSaved={reload} empty="No active downtime incidents." />}
     {view === "history" && <RecordList records={filtered} attendance={attendance} now={now} canEntry={canEntry} canClose={canClose} onSaved={reload} empty="No downtime records for this period." />}
