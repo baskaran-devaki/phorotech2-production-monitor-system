@@ -13,8 +13,19 @@ import {
 import { ReportDialog } from "@/components/report/ReportDialog";
 import { FileText, RefreshCw, Wifi, WifiOff } from "lucide-react";
 import { toast } from "sonner";
+import { MobileProductionDashboard } from "@/components/mobile/MobileProductionDashboard";
 
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "PPMS Production Dashboard · Phorotech Surfin India" },
+      { name: "description", content: "Live production performance, shift totals, hourly output, reports, and plant network status for Phorotech Surfin India." },
+      { property: "og:title", content: "PPMS Production Dashboard · Phorotech Surfin India" },
+      { property: "og:description", content: "Live production performance and plant monitoring for Phorotech Surfin India." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: Dashboard,
 });
 
@@ -37,7 +48,19 @@ function Dashboard() {
   const trend = useMemo(() => dailyTotalsForMonth(entries, mKey), [entries, mKey]);
 
   return (
-    <main className="relative z-10 mx-auto max-w-7xl px-3 sm:px-6 py-4 sm:py-6 space-y-5 sm:space-y-6">
+    <>
+      <MobileProductionDashboard
+        entries={entries}
+        businessDate={bDate}
+        monthLabel={monthName()}
+        monthlyTotal={monthlyTotal}
+        online={online}
+        isSignedIn={!!user}
+        isAdmin={isAdmin}
+        isSuperAdmin={isSuperAdmin}
+        onOpenReport={() => setReportOpen(true)}
+      />
+      <main className="relative z-10 mx-auto hidden max-w-7xl px-3 py-4 sm:px-6 sm:py-6 md:block md:space-y-6">
       <DashboardHeader isAdmin={isAdmin} isSignedIn={!!user} isSuperAdmin={isSuperAdmin} />
 
       <TotalCard total={monthlyTotal} month={monthName()} />
@@ -85,6 +108,7 @@ function Dashboard() {
       <footer className="text-center text-xs text-[color:var(--muted-foreground)] pt-2 pb-6">
         © {new Date().getFullYear()} Phorotech Surfin India Pvt Ltd · Plant II · ED Plant · Irungattukottai
       </footer>
-    </main>
+      </main>
+    </>
   );
 }
