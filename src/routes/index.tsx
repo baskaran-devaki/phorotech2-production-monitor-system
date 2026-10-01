@@ -53,7 +53,6 @@ function Dashboard() {
         entries={entries}
         businessDate={bDate}
         monthLabel={monthName()}
-        monthlyTotal={monthlyTotal}
         online={online}
         isSignedIn={!!user}
         isAdmin={isAdmin}

@@ -24,8 +24,9 @@ import {
   DAILY_TARGET,
   SHIFTS,
   SHIFT_TARGET,
-  currentMonthKey,
   currentShift,
+  monthKey,
+  monthNameFromKey,
   sumLoads,
   type ProductionEntry,
 } from "@/lib/production";
@@ -37,7 +38,6 @@ interface MobileProductionDashboardProps {
   entries: ProductionEntry[];
   businessDate: string;
   monthLabel: string;
-  monthlyTotal: number;
   online: boolean;
   isSignedIn: boolean;
   isAdmin: boolean;
@@ -56,7 +56,6 @@ export function MobileProductionDashboard({
   entries,
   businessDate,
   monthLabel,
-  monthlyTotal,
   online,
   isSignedIn,
   isAdmin,
@@ -78,9 +77,10 @@ export function MobileProductionDashboard({
   const achievement = DAILY_TARGET > 0 ? (todayTotal / DAILY_TARGET) * 100 : 0;
   const activeShift = currentShift();
   const monthlyReport = useMemo(() => {
-    const range = monthRange(currentMonthKey());
-    return buildReport(entries, range.from, range.to, monthLabel);
-  }, [entries, monthLabel]);
+    const reportMonth = monthKey(businessDate);
+    const range = monthRange(reportMonth);
+    return buildReport(entries, range.from, range.to, monthNameFromKey(reportMonth));
+  }, [businessDate, entries]);
   const hourly = SHIFTS[activeShift].slots.map((slot, index) => ({
     slot,
     loads: todayEntries.find((entry) => entry.shift === activeShift && entry.slot_index === index)?.load_count ?? 0,
@@ -217,7 +217,7 @@ export function MobileProductionDashboard({
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="mobile-eyebrow">Total Monthly Loads</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{monthLabel}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{monthlyReport.periodLabel}</p>
                 </div>
                 <p className="text-3xl font-black tabular-nums text-foreground">{monthlyReport.totalActual.toLocaleString("en-IN")}</p>
               </div>
