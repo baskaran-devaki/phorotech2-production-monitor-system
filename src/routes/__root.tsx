@@ -5,6 +5,7 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "sonner";
@@ -26,14 +27,15 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   const router = useRouter();
-  useEffect(() => { reportLovableError(error, { boundary: "tanstack_root_error_component" }); }, [error]);
+  const normalizedError = error instanceof Error ? error : new Error(String(error));
+  useEffect(() => { reportLovableError(normalizedError, { boundary: "tanstack_root_error_component" }); }, [normalizedError]);
   return (
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="glass-gold max-w-md text-center rounded-3xl p-8">
         <h1 className="display gold-text text-2xl">Something went wrong</h1>
-        <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">{error.message}</p>
+        <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">{normalizedError.message}</p>
         <div className="mt-6 flex justify-center gap-2">
           <button onClick={() => { router.invalidate(); reset(); }} className="btn-gold rounded-xl px-4 py-2 text-sm">Try again</button>
           <a href="/" className="rounded-xl px-4 py-2 text-sm border border-[color:var(--border)]">Home</a>

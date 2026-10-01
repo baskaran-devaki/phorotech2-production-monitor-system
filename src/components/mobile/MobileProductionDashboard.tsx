@@ -198,7 +198,7 @@ export function MobileProductionDashboard({
 
         {view === "reports" && (
           <section className="space-y-4">
-            <div><p className="mobile-eyebrow">Reports</p><h1 className="mt-1 text-2xl font-black">Production Reports</h1></div>
+            <div><p className="mobile-eyebrow">Reports</p><h1 className="mt-1 font-sans text-2xl font-black">Production Reports</h1></div>
             <div className="mobile-primary-card">
               <FileText className="size-7 text-mobile-accent" />
               <h2 className="mt-4 text-lg font-extrabold">Monthly Report</h2>
@@ -210,7 +210,7 @@ export function MobileProductionDashboard({
 
         {view === "analytics" && (
           <section className="space-y-4">
-            <div><p className="mobile-eyebrow">Analytics</p><h1 className="mt-1 text-2xl font-black">Production Summary</h1></div>
+            <div><p className="mobile-eyebrow">Analytics</p><h1 className="mt-1 font-sans text-2xl font-black">Production Summary</h1></div>
             <div className="mobile-primary-card">
               <p className="text-sm text-muted-foreground">{monthLabel}</p>
               <p className="mt-3 text-5xl font-black tabular-nums">{monthlyTotal.toLocaleString("en-IN")}</p>
@@ -225,8 +225,7 @@ export function MobileProductionDashboard({
               <div className="mt-3 space-y-3">
                 {ALL_SHIFTS.map((shift) => {
                   const total = sumLoads(todayEntries.filter((entry) => entry.shift === shift));
-                  const width = Math.min(100, (total / SHIFT_TARGET) * 100);
-                  return <div key={shift}><div className="mb-1 flex justify-between text-xs"><span>Shift {shift === 1 ? "I" : shift === 2 ? "II" : "III"}</span><strong>{total}</strong></div><div className="h-2 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-mobile-accent" style={{ width: `${width}%` }} /></div></div>;
+                  return <div key={shift}><div className="mb-1 flex justify-between text-xs"><span>Shift {shift === 1 ? "I" : shift === 2 ? "II" : "III"}</span><strong>{total}</strong></div><progress className="mobile-progress" value={total} max={SHIFT_TARGET} aria-label={`Shift ${shift} production`} /></div>;
                 })}
               </div>
             </section>
@@ -235,7 +234,7 @@ export function MobileProductionDashboard({
 
         {view === "settings" && (
           <section className="space-y-4">
-            <div><p className="mobile-eyebrow">Settings</p><h1 className="mt-1 text-2xl font-black">App & Display</h1></div>
+            <div><p className="mobile-eyebrow">Settings</p><h1 className="mt-1 font-sans text-2xl font-black">App & Display</h1></div>
             <div className="mobile-primary-card">
               <MonitorUp className="size-7 text-mobile-accent" />
               <h2 className="mt-4 text-lg font-extrabold">TV MODE</h2>
