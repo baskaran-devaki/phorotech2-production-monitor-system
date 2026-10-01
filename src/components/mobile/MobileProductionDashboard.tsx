@@ -18,17 +18,18 @@ import {
 import { toast } from "sonner";
 import logoAsset from "@/assets/phorotech-logo.jpg.asset.json";
 import { Button } from "@/components/ui/button";
-import { ProductionModeBadge } from "@/components/dashboard/ProductionModeControl";
 import { useProductionMode } from "@/hooks/useProductionMode";
 import {
   ALL_SHIFTS,
   DAILY_TARGET,
   SHIFTS,
   SHIFT_TARGET,
+  currentMonthKey,
   currentShift,
   sumLoads,
   type ProductionEntry,
 } from "@/lib/production";
+import { buildReport, monthRange } from "@/lib/report";
 
 type MobileView = "dashboard" | "reports" | "analytics" | "settings";
 
@@ -76,6 +77,10 @@ export function MobileProductionDashboard({
   const todayTotal = useMemo(() => sumLoads(todayEntries), [todayEntries]);
   const achievement = DAILY_TARGET > 0 ? (todayTotal / DAILY_TARGET) * 100 : 0;
   const activeShift = currentShift();
+  const monthlyReport = useMemo(() => {
+    const range = monthRange(currentMonthKey());
+    return buildReport(entries, range.from, range.to, monthLabel);
+  }, [entries, monthLabel]);
   const hourly = SHIFTS[activeShift].slots.map((slot, index) => ({
     slot,
     loads: todayEntries.find((entry) => entry.shift === activeShift && entry.slot_index === index)?.load_count ?? 0,
@@ -121,12 +126,9 @@ export function MobileProductionDashboard({
         {view === "dashboard" && (
           <>
             <section className="mobile-primary-card">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="mobile-eyebrow">Today&apos;s Production</p>
-                  <p className="mt-1 text-xs text-muted-foreground">Business date · {businessDate}</p>
-                </div>
-                <ProductionModeBadge mode={mode} />
+              <div>
+                <p className="mobile-eyebrow">Today&apos;s Production</p>
+                <p className="mt-1 text-xs text-muted-foreground">Business date · {businessDate}</p>
               </div>
               <div className="mt-5 grid grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] items-end gap-3">
                 <div>
@@ -209,26 +211,27 @@ export function MobileProductionDashboard({
         )}
 
         {view === "analytics" && (
-          <section className="space-y-4">
+          <section>
             <div><p className="mobile-eyebrow">Analytics</p><h1 className="mt-1 font-sans text-2xl font-black">Production Summary</h1></div>
-            <div className="mobile-primary-card">
-              <p className="text-sm text-muted-foreground">{monthLabel}</p>
-              <p className="mt-3 text-5xl font-black tabular-nums">{monthlyTotal.toLocaleString("en-IN")}</p>
-              <p className="mt-2 mobile-eyebrow">Total monthly loads</p>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <MobileMiniMetric label="Today" value={todayTotal.toString()} />
-              <MobileMiniMetric label="Daily Target" value={DAILY_TARGET.toString()} />
-            </div>
-            <section className="mobile-card">
-              <h2 className="mobile-section-title">Shift Distribution</h2>
-              <div className="mt-3 space-y-3">
-                {ALL_SHIFTS.map((shift) => {
-                  const total = sumLoads(todayEntries.filter((entry) => entry.shift === shift));
-                  return <div key={shift}><div className="mb-1 flex justify-between text-xs"><span>Shift {shift === 1 ? "I" : shift === 2 ? "II" : "III"}</span><strong>{total}</strong></div><progress className="mobile-progress" value={total} max={SHIFT_TARGET} aria-label={`Shift ${shift} production`} /></div>;
-                })}
+            <div className="mobile-primary-card mt-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="mobile-eyebrow">Total Monthly Loads</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{monthLabel}</p>
+                </div>
+                <p className="text-3xl font-black tabular-nums text-foreground">{monthlyReport.totalActual.toLocaleString("en-IN")}</p>
               </div>
-            </section>
+              <div className="mt-5 grid grid-cols-2 gap-2">
+                <MobileMonthlyMetric label="Total Working Days" value={monthlyReport.totalWorkingDays} />
+                <MobileMonthlyMetric label="Sunday Working Days" value={monthlyReport.sundayWorkingDays} />
+                <MobileMonthlyMetric label="Total Loads" value={monthlyReport.totalActual} />
+                <MobileMonthlyMetric label="Total Target Loads" value={monthlyReport.totalTarget} />
+                <MobileMonthlyMetric label="First Shift Loads" value={monthlyReport.shiftTotals[1]} />
+                <MobileMonthlyMetric label="Second Shift Loads" value={monthlyReport.shiftTotals[2]} />
+                <MobileMonthlyMetric label="Third Shift Loads" value={monthlyReport.shiftTotals[3]} />
+                <MobileMonthlyMetric label="Achievement" value={`${monthlyReport.achievement.toFixed(1)}%`} />
+              </div>
+            </div>
           </section>
         )}
 
@@ -266,4 +269,15 @@ export function MobileProductionDashboard({
 function MobileMiniMetric({ label, value, tone }: { label: string; value: string; tone?: "success" | "warning" | "danger" }) {
   const toneClass = tone === "success" ? "text-success" : tone === "warning" ? "text-warning" : tone === "danger" ? "text-danger" : "text-foreground";
   return <div className="mobile-mini-metric"><p className="text-[10px] font-bold uppercase text-muted-foreground">{label}</p><p className={`mt-1 text-xl font-black tabular-nums ${toneClass}`}>{value}</p></div>;
+}
+
+function MobileMonthlyMetric({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="mobile-mini-metric min-w-0">
+      <p className="text-[10px] font-bold uppercase leading-tight text-muted-foreground">{label}</p>
+      <p className="mt-1.5 break-words text-lg font-black tabular-nums text-foreground">
+        {typeof value === "number" ? value.toLocaleString("en-IN") : value}
+      </p>
+    </div>
+  );
 }
