@@ -52,7 +52,6 @@ function Dashboard() {
       <MobileProductionDashboard
         entries={entries}
         businessDate={bDate}
-        monthLabel={monthName()}
         online={online}
         isSignedIn={!!user}
         isAdmin={isAdmin}

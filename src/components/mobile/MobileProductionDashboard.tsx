@@ -37,7 +37,6 @@ type MobileView = "dashboard" | "reports" | "analytics" | "settings";
 interface MobileProductionDashboardProps {
   entries: ProductionEntry[];
   businessDate: string;
-  monthLabel: string;
   online: boolean;
   isSignedIn: boolean;
   isAdmin: boolean;
@@ -55,7 +54,6 @@ const NAV_ITEMS: Array<{ key: MobileView; label: string; icon: typeof Gauge }> =
 export function MobileProductionDashboard({
   entries,
   businessDate,
-  monthLabel,
   online,
   isSignedIn,
   isAdmin,
