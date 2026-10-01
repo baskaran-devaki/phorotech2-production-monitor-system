@@ -305,6 +305,20 @@
     backdrop-filter: blur(20px);
   }
 
+  .mobile-progress {
+    display: block;
+    width: 100%;
+    height: 0.5rem;
+    overflow: hidden;
+    border: 0;
+    border-radius: 999px;
+    background: var(--muted);
+  }
+
+  .mobile-progress::-webkit-progress-bar { background: var(--muted); }
+  .mobile-progress::-webkit-progress-value { border-radius: 999px; background: var(--mobile-accent); }
+  .mobile-progress::-moz-progress-bar { border-radius: 999px; background: var(--mobile-accent); }
+
   .mobile-nav-button {
     height: 3.5rem;
     min-width: 0;
