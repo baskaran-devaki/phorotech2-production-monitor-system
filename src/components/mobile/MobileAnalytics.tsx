@@ -41,7 +41,7 @@ export function MobileAnalytics({ entries, businessDate }: { entries: Production
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-3">
         <div className="min-w-0">
           <p className="mobile-eyebrow">Analytics</p>
-          <h1 className="mt-1 truncate font-sans text-2xl font-black">Production Summary</h1>
+          <h1 className="mt-1 font-sans text-xl font-black leading-tight">Production Summary</h1>
         </div>
         <label className="neon-select">
           <CalendarDays className="size-4 shrink-0 text-mobile-accent" />
