@@ -208,30 +208,7 @@ export function MobileProductionDashboard({
           </section>
         )}
 
-        {view === "analytics" && (
-          <section>
-            <div><p className="mobile-eyebrow">Analytics</p><h1 className="mt-1 font-sans text-2xl font-black">Production Summary</h1></div>
-            <div className="mobile-primary-card mt-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="mobile-eyebrow">Total Monthly Loads</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{monthlyReport.periodLabel}</p>
-                </div>
-                <p className="text-3xl font-black tabular-nums text-foreground">{monthlyReport.totalActual.toLocaleString("en-IN")}</p>
-              </div>
-              <div className="mt-5 grid grid-cols-2 gap-2">
-                <MobileMonthlyMetric label="Total Working Days" value={monthlyReport.totalWorkingDays} />
-                <MobileMonthlyMetric label="Sunday Working Days" value={monthlyReport.sundayWorkingDays} />
-                <MobileMonthlyMetric label="Total Loads" value={monthlyReport.totalActual} />
-                <MobileMonthlyMetric label="Total Target Loads" value={monthlyReport.totalTarget} />
-                <MobileMonthlyMetric label="First Shift Loads" value={monthlyReport.shiftTotals[1]} />
-                <MobileMonthlyMetric label="Second Shift Loads" value={monthlyReport.shiftTotals[2]} />
-                <MobileMonthlyMetric label="Third Shift Loads" value={monthlyReport.shiftTotals[3]} />
-                <MobileMonthlyMetric label="Achievement" value={`${monthlyReport.achievement.toFixed(1)}%`} />
-              </div>
-            </div>
-          </section>
-        )}
+        {view === "analytics" && <MobileAnalytics entries={entries} businessDate={businessDate} />}
 
         {view === "settings" && (
           <section className="space-y-4">
