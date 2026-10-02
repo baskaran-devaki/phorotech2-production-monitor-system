@@ -25,12 +25,10 @@ import {
   SHIFTS,
   SHIFT_TARGET,
   currentShift,
-  monthKey,
-  monthNameFromKey,
   sumLoads,
   type ProductionEntry,
 } from "@/lib/production";
-import { buildReport, monthRange } from "@/lib/report";
+import { MobileAnalytics } from "./MobileAnalytics";
 
 type MobileView = "dashboard" | "reports" | "analytics" | "settings";
 
@@ -74,11 +72,6 @@ export function MobileProductionDashboard({
   const todayTotal = useMemo(() => sumLoads(todayEntries), [todayEntries]);
   const achievement = DAILY_TARGET > 0 ? (todayTotal / DAILY_TARGET) * 100 : 0;
   const activeShift = currentShift();
-  const monthlyReport = useMemo(() => {
-    const reportMonth = monthKey(businessDate);
-    const range = monthRange(reportMonth);
-    return buildReport(entries, range.from, range.to, monthNameFromKey(reportMonth));
-  }, [businessDate, entries]);
   const hourly = SHIFTS[activeShift].slots.map((slot, index) => ({
     slot,
     loads: todayEntries.find((entry) => entry.shift === activeShift && entry.slot_index === index)?.load_count ?? 0,
@@ -246,13 +239,3 @@ function MobileMiniMetric({ label, value, tone }: { label: string; value: string
   return <div className="mobile-mini-metric"><p className="text-[10px] font-bold uppercase text-muted-foreground">{label}</p><p className={`mt-1 text-xl font-black tabular-nums ${toneClass}`}>{value}</p></div>;
 }
 
-function MobileMonthlyMetric({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="mobile-mini-metric min-w-0">
-      <p className="text-[10px] font-bold uppercase leading-tight text-muted-foreground">{label}</p>
-      <p className="mt-1.5 break-words text-lg font-black tabular-nums text-foreground">
-        {typeof value === "number" ? value.toLocaleString("en-IN") : value}
-      </p>
-    </div>
-  );
-}
