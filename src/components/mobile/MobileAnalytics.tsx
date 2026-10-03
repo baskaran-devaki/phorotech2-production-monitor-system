@@ -28,10 +28,12 @@ export function MobileAnalytics({ entries, businessDate }: { entries: Production
     return buildReport(entries, r.from, r.to, monthNameFromKey(selected));
   }, [entries, selected]);
 
-  const producing = report.days.filter((d) => d.total > 0);
-  const best = producing.reduce<typeof producing[number] | null>((a, d) => (!a || d.total > a.total ? d : a), null);
-  const lowest = producing.reduce<typeof producing[number] | null>((a, d) => (!a || d.total < a.total ? d : a), null);
-  const pct = (d: { total: number; target: number } | null) => (d && d.target ? `${((d.total / d.target) * 100).toFixed(0)}%` : "—");
+  const working = report.days.filter((d) => d.isWorkingDay);
+  const maxLoads = working.length ? Math.max(...working.map((d) => d.total)) : 0;
+  const minLoads = working.length ? Math.min(...working.map((d) => d.total)) : 0;
+  const best = working.filter((d) => d.total === maxLoads);
+  const lowest = working.filter((d) => d.total === minLoads);
+  const pct = (d: { total: number; target: number }) => (d.target ? `${((d.total / d.target) * 100).toFixed(0)}%` : "—");
   const chart = report.days.map((d) => ({ day: d.date.slice(8), loads: d.total }));
   const ach = report.achievement;
   const achColor = ach >= 90 ? "var(--neon-green)" : ach >= 60 ? "var(--neon-orange)" : "var(--neon-red)";
@@ -100,8 +102,8 @@ export function MobileAnalytics({ entries, businessDate }: { entries: Production
       <div className="neon-card">
         <p className="flex items-center gap-2 text-base font-extrabold text-foreground"><Lightbulb className="size-5 text-mobile-accent" style={{ filter: "drop-shadow(0 0 6px var(--neon-blue))" }} />Quick Insights</p>
         <div className="mt-3 space-y-2">
-          <Insight tone="var(--neon-green)" icon={<ArrowUp className="size-5" />} title="Best Performing Day" day={best} pct={pct(best)} />
-          <Insight tone="var(--neon-red)" icon={<ArrowDown className="size-5" />} title="Lowest Performing Day" day={lowest} pct={pct(lowest)} />
+          <Insight tone="var(--neon-green)" icon={<ArrowUp className="size-5" />} title="Best Performing Day" days={best} pct={pct} />
+          <Insight tone="var(--neon-red)" icon={<ArrowDown className="size-5" />} title="Lowest Performing Day" days={lowest} pct={pct} />
         </div>
       </div>
 
@@ -138,14 +140,22 @@ export function MobileAnalytics({ entries, businessDate }: { entries: Production
   );
 }
 
-function Insight({ tone, icon, title, day, pct }: { tone: string; icon: React.ReactNode; title: string; day: { date: string; total: number } | null; pct: string }) {
+function Insight({ tone, icon, title, days, pct }: { tone: string; icon: React.ReactNode; title: string; days: Array<{ date: string; total: number; target: number }>; pct: (d: { total: number; target: number }) => string }) {
   return (
     <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 rounded-lg border p-3" style={{ borderColor: `color-mix(in oklab, ${tone} 45%, transparent)`, background: `color-mix(in oklab, ${tone} 10%, transparent)` }}>
       <span className="grid size-10 place-items-center rounded-full" style={{ background: `color-mix(in oklab, ${tone} 22%, transparent)`, color: tone, boxShadow: `0 0 12px color-mix(in oklab, ${tone} 50%, transparent)` }}>{icon}</span>
       <div className="min-w-0">
         <p className="text-sm font-bold" style={{ color: tone }}>{title}</p>
-        <p className="font-extrabold text-foreground">{day ? fmtDate(day.date) : "—"}</p>
-        <p className="text-xs text-muted-foreground">Total Loads: {day ? `${day.total} (${pct})` : "—"}</p>
+        {days.length === 0 ? (
+          <p className="font-extrabold text-foreground">—</p>
+        ) : (
+          days.map((d) => (
+            <div key={d.date} className="mt-1">
+              <p className="font-extrabold text-foreground">{fmtDate(d.date)}</p>
+              <p className="text-xs text-muted-foreground">Total Loads: {d.total} ({pct(d)})</p>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
