@@ -18,6 +18,9 @@ import {
 import { toast } from "sonner";
 import logoAsset from "@/assets/phorotech-logo.jpg.asset.json";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import { KeyRound } from "lucide-react";
 import { useProductionMode } from "@/hooks/useProductionMode";
 import {
   ALL_SHIFTS,
@@ -116,20 +119,14 @@ export function MobileProductionDashboard({
       <main className="space-y-4 px-4 pb-28 pt-4">
         {view === "dashboard" && (
           <>
-            <section className="mobile-primary-card">
-              <div>
-                <p className="mobile-eyebrow">Today&apos;s Production</p>
-                <p className="mt-1 text-xs text-muted-foreground">Business date · {businessDate}</p>
-              </div>
-              <div className="mt-5 grid grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] items-end gap-3">
-                <div>
-                  <p className="text-5xl font-black leading-none text-foreground tabular-nums">{todayTotal.toLocaleString("en-IN")}</p>
-                  <p className="mt-2 text-xs font-bold uppercase text-muted-foreground">Actual loads</p>
-                </div>
-                <div className="grid grid-cols-1 gap-2">
-                  <MobileMiniMetric label="Target" value={DAILY_TARGET.toString()} />
-                  <MobileMiniMetric label="Achievement" value={`${achievement.toFixed(1)}%`} tone={achievement >= 90 ? "success" : achievement >= 60 ? "warning" : "danger"} />
-                </div>
+            <section className="neon-card text-center">
+              <p className="text-base font-black uppercase tracking-wide text-mobile-accent" style={{ textShadow: "0 0 12px var(--neon-blue)" }}>Today&apos;s Production</p>
+              <p className="mt-1 text-sm text-muted-foreground">Business date · {businessDate}</p>
+              <p className="neon-text mt-4 text-6xl font-black leading-none tabular-nums">{todayTotal.toLocaleString("en-IN")}</p>
+              <p className="mt-2 text-sm font-extrabold uppercase tracking-wider" style={{ color: "var(--neon-green)", textShadow: "0 0 10px var(--neon-green)" }}>Actual Loads</p>
+              <div className="mt-4 grid grid-cols-2 gap-2 text-left">
+                <NeonMetric label="Target" value={DAILY_TARGET.toString()} color="var(--neon-orange)" />
+                <NeonMetric label="Achievement" value={`${achievement.toFixed(1)}%`} color={achievement >= 90 ? "var(--neon-green)" : achievement >= 60 ? "var(--neon-orange)" : "var(--neon-red)"} />
               </div>
             </section>
 
@@ -142,13 +139,14 @@ export function MobileProductionDashboard({
                 {ALL_SHIFTS.map((shift) => {
                   const total = sumLoads(todayEntries.filter((entry) => entry.shift === shift));
                   const active = shift === activeShift;
+                  const color = shift === 1 ? "var(--neon-blue)" : shift === 2 ? "var(--neon-orange)" : "var(--neon-green)";
                   return (
-                    <article key={shift} className={`mobile-shift-card ${active ? "mobile-shift-card-active" : ""}`}>
+                    <article key={shift} className="neon-card p-3" style={{ borderColor: `color-mix(in oklab, ${color} 55%, transparent)`, boxShadow: active ? `0 0 18px -4px ${color}` : undefined }}>
                       <div className="flex items-center justify-between gap-1">
-                        <span className="text-xs font-extrabold">Shift {shift === 1 ? "I" : shift === 2 ? "II" : "III"}</span>
-                        {active && <span className="size-1.5 rounded-full bg-success" />}
+                        <span className="text-xs font-extrabold" style={{ color }}>Shift {shift === 1 ? "I" : shift === 2 ? "II" : "III"}</span>
+                        {active && <span className="size-2 rounded-full" style={{ background: "var(--neon-green)", boxShadow: "0 0 8px var(--neon-green)" }} />}
                       </div>
-                      <p className="mt-3 text-2xl font-black tabular-nums">{total}</p>
+                      <p className="mt-3 text-2xl font-black tabular-nums" style={{ textShadow: `0 0 10px ${color}` }}>{total}</p>
                       <p className="text-[10px] text-muted-foreground">of {SHIFT_TARGET}</p>
                     </article>
                   );
@@ -156,32 +154,32 @@ export function MobileProductionDashboard({
               </div>
             </section>
 
-            <section className="mobile-card">
+            <section className="neon-card">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <h2 className="mobile-section-title">Hourly Production</h2>
                   <p className="text-xs text-muted-foreground">{SHIFTS[activeShift].label} · {SHIFTS[activeShift].range}</p>
                 </div>
-                <Activity className="size-5 text-mobile-accent" />
+                <Activity className="size-5 text-mobile-accent" style={{ filter: "drop-shadow(0 0 6px var(--neon-blue))" }} />
               </div>
               <div className="mt-3 divide-y divide-border">
                 {hourly.map(({ slot, loads }) => (
                   <div key={slot} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2.5">
                     <span className="min-w-0 truncate text-xs text-muted-foreground">{slot}</span>
-                    <strong className="tabular-nums text-foreground">{loads}</strong>
+                    <strong className="tabular-nums" style={{ color: loads > 0 ? "var(--neon-green)" : "var(--muted-foreground)", textShadow: loads > 0 ? "0 0 8px var(--neon-green)" : undefined }}>{loads}</strong>
                   </div>
                 ))}
               </div>
             </section>
 
             <section className="grid grid-cols-2 gap-2">
-              <div className="mobile-card p-3">
+              <div className="neon-card p-3">
                 <p className="mobile-eyebrow">Mode</p>
-                <p className="mt-2 font-extrabold text-foreground">{mode ? `${mode} MODE` : "—"}</p>
+                <p className="mt-2 font-extrabold" style={{ color: "var(--neon-orange)", textShadow: "0 0 8px var(--neon-orange)" }}>{mode ? `${mode} MODE` : "—"}</p>
               </div>
-              <div className="mobile-card p-3">
+              <div className="neon-card p-3">
                 <p className="mobile-eyebrow">Network Status</p>
-                <div className={`mt-2 flex items-center gap-2 font-extrabold ${online ? "text-success" : "text-danger"}`}>
+                <div className={`mt-2 flex items-center gap-2 font-extrabold ${online ? "text-success" : "text-danger"}`} style={{ textShadow: `0 0 8px ${online ? "var(--neon-green)" : "var(--neon-red)"}` }}>
                   {online ? <Wifi className="size-4" /> : <WifiOff className="size-4" />}{online ? "Live" : "Offline"}
                 </div>
               </div>
@@ -217,6 +215,7 @@ export function MobileProductionDashboard({
               </div>
             </div>
             {!isSignedIn && <Button asChild variant="outline" className="h-11 w-full"><Link to="/auth"><LogIn />Sign In</Link></Button>}
+            {isSignedIn && <MobilePasswordChange />}
             {isAdmin && <Button asChild variant="outline" className="h-11 w-full"><Link to="/admin"><Shield />Admin Panel</Link></Button>}
             {isSuperAdmin && <Button asChild variant="outline" className="h-11 w-full"><Link to="/super"><Shield />Super Admin</Link></Button>}
           </section>
@@ -234,8 +233,43 @@ export function MobileProductionDashboard({
   );
 }
 
-function MobileMiniMetric({ label, value, tone }: { label: string; value: string; tone?: "success" | "warning" | "danger" }) {
-  const toneClass = tone === "success" ? "text-success" : tone === "warning" ? "text-warning" : tone === "danger" ? "text-danger" : "text-foreground";
-  return <div className="mobile-mini-metric"><p className="text-[10px] font-bold uppercase text-muted-foreground">{label}</p><p className={`mt-1 text-xl font-black tabular-nums ${toneClass}`}>{value}</p></div>;
+function NeonMetric({ label, value, color }: { label: string; value: string; color: string }) {
+  return (
+    <div className="rounded-lg border p-3 text-center" style={{ borderColor: `color-mix(in oklab, ${color} 50%, transparent)`, background: `color-mix(in oklab, ${color} 10%, transparent)` }}>
+      <p className="text-xs font-bold uppercase text-muted-foreground">{label}</p>
+      <p className="mt-1 text-2xl font-black tabular-nums" style={{ color, textShadow: `0 0 10px ${color}` }}>{value}</p>
+    </div>
+  );
+}
+
+function MobilePasswordChange() {
+  const [pw, setPw] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (pw.length < 8 || !/[a-z]/.test(pw) || !/[A-Z]/.test(pw) || !/\d/.test(pw) || !/[^A-Za-z0-9]/.test(pw)) {
+      toast.error("Use 8+ characters with upper, lower, number and special character");
+      return;
+    }
+    if (pw !== confirm) { toast.error("Passwords do not match"); return; }
+    setBusy(true);
+    const { error } = await supabase.auth.updateUser({ password: pw });
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    setPw(""); setConfirm("");
+    toast.success("Password changed successfully");
+  }
+
+  return (
+    <form onSubmit={submit} className="neon-card space-y-3">
+      <KeyRound className="size-7 text-mobile-accent" />
+      <h2 className="text-lg font-extrabold">Change Password</h2>
+      <Input type="password" autoComplete="new-password" placeholder="New password" value={pw} onChange={(e) => setPw(e.target.value)} className="h-11" />
+      <Input type="password" autoComplete="new-password" placeholder="Confirm new password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className="h-11" />
+      <Button type="submit" className="h-11 w-full" disabled={busy || !pw}>{busy ? "Updating…" : "Update Password"}</Button>
+    </form>
+  );
 }
 
