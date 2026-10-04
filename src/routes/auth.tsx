@@ -3,7 +3,8 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Mail, KeyRound, ArrowLeft } from "lucide-react";
-import logoAsset from "@/assets/phorotech-logo.jpg.asset.json";
+import logoUrl from "@/assets/phorotech-logo.jpeg";
+const logoAsset = { url: logoUrl };
 
 export const Route = createFileRoute("/auth")({
   head: () => ({

@@ -2,7 +2,8 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import ExcelJS from "exceljs";
 import { downtimeMinutes, formatDuration, type DowntimeRecord } from "@/lib/downtime";
-import logoAsset from "@/assets/phorotech-logo.jpg.asset.json";
+import logoUrl from "@/assets/phorotech-logo.jpeg";
+const logoAsset = { url: logoUrl };
 
 export async function exportDowntimePDF(records: DowntimeRecord[], period: string) {
   const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "portrait" });

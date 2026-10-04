@@ -8,7 +8,8 @@ import {
   previousMonthKey, sumLoads, totalForMonth,
 } from "@/lib/production";
 import { buildReport, monthRange } from "@/lib/report";
-import logoAsset from "@/assets/phorotech-logo.jpg.asset.json";
+import logoUrl from "@/assets/phorotech-logo.jpeg";
+const logoAsset = { url: logoUrl };
 
 export const Route = createFileRoute("/tv")({
   ssr: false,
