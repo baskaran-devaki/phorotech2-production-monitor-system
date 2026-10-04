@@ -380,3 +380,43 @@
   .marquee-track { animation: none !important; }
 }
 
+
+@layer components {
+  .splash-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: clamp(0.5rem, 1.5vmin, 1.25rem); padding: 1.5rem; text-align: center;
+    background: radial-gradient(ellipse at center, oklch(0.16 0.02 80 / 60%), transparent 65%), var(--background);
+    transition: opacity 0.5s ease;
+  }
+  .splash-fade { opacity: 0; pointer-events: none; }
+  .splash-logo-wrap {
+    display: grid; place-items: center;
+    width: clamp(5.5rem, 18vmin, 11rem); aspect-ratio: 1;
+    border-radius: 1.25rem; background: var(--foreground); padding: 0.4rem;
+    box-shadow: 0 0 40px -8px oklch(0.78 0.14 82 / 55%);
+    animation: pulse-gold 2.4s ease-in-out infinite;
+  }
+  .splash-logo { width: 100%; height: 100%; object-fit: contain; border-radius: 1rem; }
+  .splash-title {
+    margin-top: 0.5rem; font-family: var(--font-display); font-weight: 800;
+    font-size: clamp(2.25rem, 8vmin, 5rem); letter-spacing: 0.12em; line-height: 1;
+    background: var(--gradient-gold); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .splash-subtitle {
+    color: var(--muted-foreground); font-weight: 600; letter-spacing: 0.04em;
+    font-size: clamp(0.8rem, 2.2vmin, 1.35rem);
+  }
+  .splash-bar {
+    position: relative; overflow: hidden; margin-top: 0.75rem;
+    width: clamp(8rem, 26vmin, 16rem); height: 3px; border-radius: 999px; background: var(--muted);
+  }
+  .splash-bar span {
+    position: absolute; inset: 0; width: 40%; border-radius: 999px;
+    background: var(--gradient-gold); animation: splash-load 1.1s ease-in-out infinite;
+  }
+}
+@keyframes splash-load { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+@media (prefers-reduced-motion: reduce) {
+  .splash-logo-wrap, .splash-bar span { animation: none !important; }
+}
