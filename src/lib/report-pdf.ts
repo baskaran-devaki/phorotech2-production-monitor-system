@@ -2,7 +2,8 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { ALL_SHIFTS, SHIFTS, formatDMY, type ShiftNum } from "./production";
 import type { ReportData } from "./report";
-import logoAsset from "@/assets/phorotech-logo.jpg.asset.json";
+import logoUrl from "@/assets/phorotech-logo.jpeg";
+const logoAsset = { url: logoUrl };
 
 const GOLD: [number, number, number] = [176, 137, 34];
 const DARK: [number, number, number] = [24, 24, 24];

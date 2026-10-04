@@ -4,7 +4,8 @@ import { Link } from "@tanstack/react-router";
 import { LogIn, Shield, Tv, Crown } from "lucide-react";
 import { ProductionModeBadge } from "@/components/dashboard/ProductionModeControl";
 import { useProductionMode } from "@/hooks/useProductionMode";
-import logoAsset from "@/assets/phorotech-logo.jpg.asset.json";
+import logoUrl from "@/assets/phorotech-logo.jpeg";
+const logoAsset = { url: logoUrl };
 
 export function DashboardHeader({ isAdmin, isSignedIn, isSuperAdmin = false }: { isAdmin: boolean; isSignedIn: boolean; isSuperAdmin?: boolean }) {
   const [now, setNow] = useState<Date | null>(null);
