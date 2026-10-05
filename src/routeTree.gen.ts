@@ -19,6 +19,7 @@ import { Route as AuthenticatedSuperRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDowntimeRouteImport } from './routes/_authenticated/downtime'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiPublicRecordProductionRouteImport } from './routes/api/public/record-production'
+import { Route as ApiPublicAdminRelayRouteImport } from './routes/api/public/admin-relay'
 
 const TvRoute = TvRouteImport.update({
   id: '/tv',
@@ -70,6 +71,11 @@ const ApiPublicRecordProductionRoute =
     path: '/api/public/record-production',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAdminRelayRoute = ApiPublicAdminRelayRouteImport.update({
+  id: '/api/public/admin-relay',
+  path: '/api/public/admin-relay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/downtime': typeof AuthenticatedDowntimeRoute
   '/super': typeof AuthenticatedSuperRoute
+  '/api/public/admin-relay': typeof ApiPublicAdminRelayRoute
   '/api/public/record-production': typeof ApiPublicRecordProductionRoute
 }
 export interface FileRoutesByTo {
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/downtime': typeof AuthenticatedDowntimeRoute
   '/super': typeof AuthenticatedSuperRoute
+  '/api/public/admin-relay': typeof ApiPublicAdminRelayRoute
   '/api/public/record-production': typeof ApiPublicRecordProductionRoute
 }
 export interface FileRoutesById {
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/downtime': typeof AuthenticatedDowntimeRoute
   '/_authenticated/super': typeof AuthenticatedSuperRoute
+  '/api/public/admin-relay': typeof ApiPublicAdminRelayRoute
   '/api/public/record-production': typeof ApiPublicRecordProductionRoute
 }
 export interface FileRouteTypes {
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/downtime'
     | '/super'
+    | '/api/public/admin-relay'
     | '/api/public/record-production'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/downtime'
     | '/super'
+    | '/api/public/admin-relay'
     | '/api/public/record-production'
   id:
     | '__root__'
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/downtime'
     | '/_authenticated/super'
+    | '/api/public/admin-relay'
     | '/api/public/record-production'
   fileRoutesById: FileRoutesById
 }
@@ -150,6 +162,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TvRoute: typeof TvRoute
+  ApiPublicAdminRelayRoute: typeof ApiPublicAdminRelayRoute
   ApiPublicRecordProductionRoute: typeof ApiPublicRecordProductionRoute
 }
 
@@ -225,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicRecordProductionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin-relay': {
+      id: '/api/public/admin-relay'
+      path: '/api/public/admin-relay'
+      fullPath: '/api/public/admin-relay'
+      preLoaderRoute: typeof ApiPublicAdminRelayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -250,6 +270,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TvRoute: TvRoute,
+  ApiPublicAdminRelayRoute: ApiPublicAdminRelayRoute,
   ApiPublicRecordProductionRoute: ApiPublicRecordProductionRoute,
 }
 export const routeTree = rootRouteImport
