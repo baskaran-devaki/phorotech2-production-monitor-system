@@ -60,6 +60,17 @@ export const Route = createFileRoute('/api/public/record-production')({
 
       POST: async ({ request }) => {
         try {
+          // Hosts without the privileged key (e.g. Vercel) relay the untouched request to the
+          // Lovable-hosted endpoint, which validates the device key and records the load.
+          if (!process.env['SUPABASE_SERVICE_ROLE_KEY']) {
+            const origin = (process.env['PPMS_RELAY_ORIGIN'] || 'https://phorotech2-production-monitor-system.lovable.app').replace(/\/$/, '');
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+            const dk = request.headers.get('x-device-key');
+            if (dk) headers['x-device-key'] = dk;
+            const upstream = await fetch(`${origin}/api/public/record-production`, { method: 'POST', headers, body: await request.text() });
+            return new Response(await upstream.text(), { status: upstream.status, headers: { 'Content-Type': 'application/json', ...corsHeaders } });
+          }
+
           const expectedKey = process.env['IOT_DEVICE_KEY'];
           if (!expectedKey) {
             console.error('[record-production] IOT_DEVICE_KEY is not configured');
