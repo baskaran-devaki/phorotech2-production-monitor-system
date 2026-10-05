@@ -9,35 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TvRouteImport } from './routes/tv'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedDowntimeRouteImport } from './routes/_authenticated/downtime'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSuperRouteImport } from './routes/_authenticated/super'
-import { Route as ApiPublicAdminRelayRouteImport } from './routes/api/public/admin-relay'
+import { Route as AuthenticatedDowntimeRouteImport } from './routes/_authenticated/downtime'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ApiPublicRecordProductionRouteImport } from './routes/api/public/record-production'
+import { Route as ApiPublicAdminRelayRouteImport } from './routes/api/public/admin-relay'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
+const TvRoute = TvRouteImport.update({
+  id: '/tv',
+  path: '/tv',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -45,14 +31,28 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TvRoute = TvRouteImport.update({
-  id: '/tv',
-  path: '/tv',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSuperRoute = AuthenticatedSuperRouteImport.update({
+  id: '/super',
+  path: '/super',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDowntimeRoute = AuthenticatedDowntimeRouteImport.update({
@@ -60,15 +60,10 @@ const AuthenticatedDowntimeRoute = AuthenticatedDowntimeRouteImport.update({
   path: '/downtime',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSuperRoute = AuthenticatedSuperRouteImport.update({
-  id: '/super',
-  path: '/super',
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const ApiPublicAdminRelayRoute = ApiPublicAdminRelayRouteImport.update({
-  id: '/api/public/admin-relay',
-  path: '/api/public/admin-relay',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicRecordProductionRoute =
   ApiPublicRecordProductionRouteImport.update({
@@ -76,6 +71,11 @@ const ApiPublicRecordProductionRoute =
     path: '/api/public/record-production',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicAdminRelayRoute = ApiPublicAdminRelayRouteImport.update({
+  id: '/api/public/admin-relay',
+  path: '/api/public/admin-relay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -168,32 +168,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
+    '/tv': {
+      id: '/tv'
+      path: '/tv'
+      fullPath: '/tv'
+      preLoaderRoute: typeof TvRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -203,18 +182,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tv': {
-      id: '/tv'
-      path: '/tv'
-      fullPath: '/tv'
-      preLoaderRoute: typeof TvRouteImport
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/super': {
+      id: '/_authenticated/super'
+      path: '/super'
+      fullPath: '/super'
+      preLoaderRoute: typeof AuthenticatedSuperRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/downtime': {
@@ -224,25 +224,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDowntimeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/super': {
-      id: '/_authenticated/super'
-      path: '/super'
-      fullPath: '/super'
-      preLoaderRoute: typeof AuthenticatedSuperRouteImport
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/api/public/admin-relay': {
-      id: '/api/public/admin-relay'
-      path: '/api/public/admin-relay'
-      fullPath: '/api/public/admin-relay'
-      preLoaderRoute: typeof ApiPublicAdminRelayRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/api/public/record-production': {
       id: '/api/public/record-production'
       path: '/api/public/record-production'
       fullPath: '/api/public/record-production'
       preLoaderRoute: typeof ApiPublicRecordProductionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/admin-relay': {
+      id: '/api/public/admin-relay'
+      path: '/api/public/admin-relay'
+      fullPath: '/api/public/admin-relay'
+      preLoaderRoute: typeof ApiPublicAdminRelayRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
