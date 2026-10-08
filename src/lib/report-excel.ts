@@ -162,10 +162,6 @@ export async function generateReportExcel(
   const blob = new Blob([buf], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `PPMS-Production-Report-${report.from}_to_${report.to}.xlsx`;
-  a.click();
-  URL.revokeObjectURL(url);
+  const { downloadBlob } = await import("./download-file");
+  downloadBlob(blob, `PPMS-Production-Report-${report.from}_to_${report.to}.xlsx`);
 }

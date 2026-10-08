@@ -271,5 +271,6 @@ export async function generateReportPDF(
     drawFooter();
   }
 
-  doc.save(`PPMS-Production-Report-${report.from}_to_${report.to}.pdf`);
+  const { downloadBlob } = await import("./download-file");
+  downloadBlob(doc.output("blob"), `PPMS-Production-Report-${report.from}_to_${report.to}.pdf`);
 }
