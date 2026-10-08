@@ -96,17 +96,17 @@ function Dashboard() {
         </div>
       </section>
 
-      <ReportDialog
-        open={reportOpen}
-        onOpenChange={setReportOpen}
-        generatedBy={user?.email ?? "Guest"}
-      />
 
 
       <footer className="text-center text-xs text-[color:var(--muted-foreground)] pt-2 pb-6">
         © {new Date().getFullYear()} Phorotech Surfin India Pvt Ltd · Plant II · ED Plant · Irungattukottai
       </footer>
       </main>
+      <ReportDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        generatedBy={user?.email ?? "Guest"}
+      />
     </>
   );
 }

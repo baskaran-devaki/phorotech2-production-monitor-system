@@ -7,6 +7,9 @@ const logoAsset = { url: logoUrl };
 
 const GOLD: [number, number, number] = [176, 137, 34];
 const DARK: [number, number, number] = [24, 24, 24];
+const HEAD_BG: [number, number, number] = [250, 245, 230];
+const BAR: [number, number, number] = [226, 205, 150];
+const BAR_LINE: [number, number, number] = [196, 168, 100];
 
 function generatedTime(date: Date): string {
   const parts = new Intl.DateTimeFormat("en-GB", {
@@ -119,7 +122,7 @@ export async function generateReportPDF(
     startY: y,
     head: [["Shift Summary", "Total Loads"]],
     theme: "grid",
-    headStyles: { fillColor: GOLD, textColor: [17, 17, 17], fontStyle: "bold", fontSize: 9.5 },
+    headStyles: { fillColor: HEAD_BG, textColor: [40, 40, 40], lineColor: [200, 200, 200], lineWidth: 0.5, fontStyle: "bold", fontSize: 9.5 },
     styles: { fontSize: 9.5, cellPadding: 5 },
     columnStyles: { 0: { cellWidth: 170 } },
     body: [
@@ -136,7 +139,7 @@ export async function generateReportPDF(
     startY: y,
     head: [["Highest Production Day", ""]],
     theme: "grid",
-    headStyles: { fillColor: GOLD, textColor: [17, 17, 17], fontStyle: "bold", fontSize: 9.5 },
+    headStyles: { fillColor: HEAD_BG, textColor: [40, 40, 40], lineColor: [200, 200, 200], lineWidth: 0.5, fontStyle: "bold", fontSize: 9.5 },
     styles: { fontSize: 9.5, cellPadding: 5 },
     columnStyles: { 0: { cellWidth: 170 } },
     body: [
@@ -181,8 +184,10 @@ export async function generateReportPDF(
   report.trend.forEach((t, i) => {
     const h = (t.loads / maxLoads) * (chartH - 8);
     const bx = cx + i * step + (step - barW) / 2;
-    doc.setFillColor(...GOLD);
-    doc.rect(bx, baseY - h, barW, h, "F");
+    doc.setFillColor(...BAR);
+    doc.setDrawColor(...BAR_LINE);
+    doc.setLineWidth(0.4);
+    doc.rect(bx, baseY - h, barW, h, "FD");
     if (n <= 31) {
       doc.setFontSize(6);
       doc.setTextColor(110, 110, 110);
@@ -219,8 +224,8 @@ export async function generateReportPDF(
         ],
       ],
       theme: "grid",
-      headStyles: { fillColor: GOLD, textColor: [17, 17, 17], fontStyle: "bold" },
-      footStyles: { fillColor: [240, 240, 240], textColor: [17, 17, 17], fontStyle: "bold" },
+      headStyles: { fillColor: HEAD_BG, textColor: [40, 40, 40], lineColor: [200, 200, 200], lineWidth: 0.5, fontStyle: "bold" },
+      footStyles: { fillColor: [247, 247, 247], textColor: [17, 17, 17], fontStyle: "bold" },
       styles: { fontSize: 8.5, cellPadding: 4, overflow: "linebreak" },
       columnStyles: {
         0: { cellWidth: 72 },
@@ -257,7 +262,7 @@ export async function generateReportPDF(
       head,
       body,
       theme: "grid",
-      headStyles: { fillColor: GOLD, textColor: [17, 17, 17], fontStyle: "bold", fontSize: 7 },
+      headStyles: { fillColor: HEAD_BG, textColor: [40, 40, 40], lineColor: [200, 200, 200], lineWidth: 0.5, fontStyle: "bold", fontSize: 7 },
       styles: { fontSize: 7, cellPadding: 2.5, halign: "center", overflow: "linebreak" },
       columnStyles: { 0: { cellWidth: 54, halign: "left" }, 1: { cellWidth: 40, halign: "left" } },
       margin: { left: M, right: M, top: 92, bottom: 56 },
@@ -271,5 +276,6 @@ export async function generateReportPDF(
     drawFooter();
   }
 
-  doc.save(`PPMS-Production-Report-${report.from}_to_${report.to}.pdf`);
+  const { downloadBlob } = await import("./download-file");
+  downloadBlob(doc.output("blob"), `PPMS-Production-Report-${report.from}_to_${report.to}.pdf`);
 }
