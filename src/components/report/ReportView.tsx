@@ -23,7 +23,7 @@ export function ReportView({
       <style>{`@media print { .no-print { display: none !important; } @page { size: A4 portrait; margin: 12mm; } .report-page { box-shadow: none !important; margin: 0 !important; page-break-after: always; } }`}</style>
 
       <div className="no-print sticky top-0 z-10 flex items-center justify-between gap-2 bg-[#0b0b0b] border-b border-[color:var(--border)] px-4 py-3">
-        <span className="text-sm font-bold text-white">Report Preview — {report.periodLabel}</span>
+        <span className="text-sm font-bold text-white truncate min-w-0">Report Preview — {report.periodLabel}</span>
         <div className="flex gap-2">
           <button
             onClick={onClose}
@@ -90,7 +90,7 @@ export function ReportView({
               {report.trend.map((t) => (
                 <div key={t.date} className="flex-1 flex flex-col items-center justify-end h-full">
                   <div
-                    className="w-full bg-[#b08922]"
+                    className="w-full bg-[#e2cd96] border border-[#c4a864]"
                     style={{ height: `${(t.loads / maxLoads) * 100}%` }}
                     title={`${formatDMY(t.date)} · ${t.loads}`}
                   />
@@ -117,7 +117,7 @@ export function ReportView({
               <thead>
                 <tr>
                   {["Date", "Shift 1", "Shift 2", "Shift 3", "Daily Total", "Remarks"].map((h) => (
-                    <th key={h} className="border border-gray-300 bg-[#b08922] text-black px-2 py-1.5 font-bold">
+                    <th key={h} className="border border-gray-300 bg-[#faf5e6] text-[#282828] px-2 py-1.5 font-bold">
                       {h}
                     </th>
                   ))}
@@ -150,7 +150,7 @@ export function ReportView({
                 <tr>
                   {["Date", "Shift", ...SHIFTS[1].slots.map((_, i) => `H${i + 1}`), "Shift Total", "Daily Total"].map(
                     (h) => (
-                      <th key={h} className="border border-gray-300 bg-[#b08922] text-black px-1 py-1 font-bold">
+                      <th key={h} className="border border-gray-300 bg-[#faf5e6] text-[#282828] px-1 py-1 font-bold">
                         {h}
                       </th>
                     ),
@@ -210,7 +210,7 @@ function Block({ title, rows }: { title: string; rows: Array<[string, string | n
     <table className="w-full mt-4 text-sm border-collapse">
       <thead>
         <tr>
-          <th colSpan={2} className="border border-gray-300 bg-[#b08922] text-black text-left px-3 py-1.5 font-bold">
+          <th colSpan={2} className="border border-gray-300 bg-[#faf5e6] text-[#282828] text-left px-3 py-1.5 font-bold">
             {title}
           </th>
         </tr>
