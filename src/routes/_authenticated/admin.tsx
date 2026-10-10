@@ -12,6 +12,11 @@ export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
       { title: "Admin Panel · Phorotech Production" },
+      { name: "description", content: "Authorized production management in Phorotech PPMS." },
+      { property: "og:title", content: "Admin Panel · Phorotech Production" },
+      { property: "og:description", content: "Authorized production management in Phorotech PPMS." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

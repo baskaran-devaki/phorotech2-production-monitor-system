@@ -14,7 +14,14 @@ const logoAsset = { url: logoUrl };
 export const Route = createFileRoute("/tv")({
   ssr: false,
   component: TvDisplay,
-  head: () => ({ meta: [{ title: "Phorotech TV Display · Live Production" }] }),
+  head: () => ({ meta: [
+    { title: "Phorotech TV Display · Live Production" },
+    { name: "description", content: "Live Phorotech PPMS factory production display and shift performance." },
+    { property: "og:title", content: "Phorotech TV Display · Live Production" },
+    { property: "og:description", content: "Live Phorotech PPMS factory production display and shift performance." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
 });
 
 function TvDisplay() {
