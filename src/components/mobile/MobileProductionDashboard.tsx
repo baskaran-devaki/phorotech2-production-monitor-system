@@ -160,13 +160,13 @@ export function MobileProductionDashboard({
                   <Calendar mode="single" selected={parseISO(selectedDate)} defaultMonth={parseISO(selectedDate)}
                     className="pointer-events-auto" disabled={{ after: parseISO(currentDate) }}
                     modifiers={loading ? {} : {
-                      production: (date) => productionDates.has(format(date, "dd-MM-yyyy")),
-                      empty: (date) => format(date, "dd-MM-yyyy") <= currentDate && !productionDates.has(format(date, "dd-MM-yyyy")),
+                      production: (date) => productionDates.has(format(date, "yyyy-MM-dd")),
+                      empty: (date) => format(date, "yyyy-MM-dd") <= currentDate && !productionDates.has(format(date, "yyyy-MM-dd")),
                     }}
                     modifiersClassNames={{ production: "production-calendar-day", empty: "empty-calendar-day" }}
                     onSelect={(date) => {
                       if (!date) return;
-                      const value = format(date, "dd-MM-yyyy");
+                      const value = format(date, "yyyy-MM-dd");
                       void navigate({ search: (previous) => ({ ...previous, mobileDate: value === currentDate ? undefined : value, mobileShift: undefined }) });
                       setCalendarOpen(false);
                     }} />
