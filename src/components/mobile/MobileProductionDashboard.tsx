@@ -138,7 +138,7 @@ export function MobileProductionDashboard({
           <img src={logoAsset.url} alt="Phorotech Surfin India" className="size-11 shrink-0 rounded-md bg-background object-contain p-0.5" />
           <div className="min-w-0">
             <p className="truncate text-sm font-extrabold text-foreground">PHOROTECH SURFIN INDIA</p>
-            <p className="truncate text-xs font-semibold text-mobile-accent">Production Monitoring System</p>
+            <p className="truncate text-xs font-semibold text-mobile-accent">Plant II - ED - PPMS</p>
           </div>
         </div>
         <span className={`size-2.5 shrink-0 rounded-full ${online ? "bg-success" : "bg-danger"}`} aria-label={online ? "Network online" : "Network offline"} />
@@ -153,20 +153,20 @@ export function MobileProductionDashboard({
                 <PopoverTrigger asChild>
                   <Button variant="ghost" className="mt-1 h-auto min-h-11 w-full flex-wrap gap-2 text-sm" aria-label="Select business date">
                     <CalendarDays className="size-4 shrink-0 text-mobile-accent" />
-                    <span>Business date · {selectedDate}</span><ChevronDown className="size-4 shrink-0" />
+                    <span>Business date : {selectedDate}</span><ChevronDown className="size-4 shrink-0" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="center" className="mobile-production-calendar w-auto max-w-[calc(100vw-2rem)] p-0">
                   <Calendar mode="single" selected={parseISO(selectedDate)} defaultMonth={parseISO(selectedDate)}
                     className="pointer-events-auto" disabled={{ after: parseISO(currentDate) }}
                     modifiers={loading ? {} : {
-                      production: (date) => productionDates.has(format(date, "yyyy-MM-dd")),
-                      empty: (date) => format(date, "yyyy-MM-dd") <= currentDate && !productionDates.has(format(date, "yyyy-MM-dd")),
+                      production: (date) => productionDates.has(format(date, "dd-MM-yyyy")),
+                      empty: (date) => format(date, "yyyy-MM-dd") <= currentDate && !productionDates.has(format(date, "dd-MM-yyyy")),
                     }}
                     modifiersClassNames={{ production: "production-calendar-day", empty: "empty-calendar-day" }}
                     onSelect={(date) => {
                       if (!date) return;
-                      const value = format(date, "yyyy-MM-dd");
+                      const value = format(date, "dd-MM-yyyy");
                       void navigate({ search: (previous) => ({ ...previous, mobileDate: value === currentDate ? undefined : value, mobileShift: undefined }) });
                       setCalendarOpen(false);
                     }} />
