@@ -36,7 +36,7 @@ export function MobileAnalytics({ entries, businessDate }: { entries: Production
   const pct = (d: { total: number; target: number }) => (d.target ? `${((d.total / d.target) * 100).toFixed(0)}%` : "—");
   const chart = report.days.map((d) => ({ day: d.date.slice(8), loads: d.total }));
   const ach = report.achievement;
-  const achColor = ach >= 90 ? "var(--neon-green)" : ach >= 60 ? "var(--neon-orange)" : "var(--neon-red)";
+  const achColor = ach >= 80 ? "var(--neon-green)" : ach >= 60 ? "var(--neon-orange)" : "var(--neon-red)";
 
   return (
     <section className="space-y-4">
