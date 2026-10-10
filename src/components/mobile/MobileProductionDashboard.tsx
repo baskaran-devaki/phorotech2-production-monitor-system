@@ -181,7 +181,7 @@ export function MobileProductionDashboard({
               {!dayLoading && todayTotal === 0 && <p role="status" className="mt-3 text-sm text-muted-foreground">No production for {selectedDate}</p>}
               <div className="mt-4 grid grid-cols-2 gap-2 text-left">
                 <NeonMetric label="Target" value={DAILY_TARGET.toString()} color="var(--neon-orange)" />
-                <NeonMetric label="Achievement" value={dayLoading ? "—" : `${achievement.toFixed(1)}%`} color={achievement >= 90 ? "var(--neon-green)" : achievement >= 60 ? "var(--neon-orange)" : "var(--neon-red)"} />
+                <NeonMetric label="Achievement" value={dayLoading ? "—" : `${achievement.toFixed(1)}%`} color={achievement >= 80 ? "var(--neon-green)" : achievement >= 60 ? "var(--neon-orange)" : "var(--neon-red)"} />
               </div>
               </>}
             </section>
@@ -191,7 +191,7 @@ export function MobileProductionDashboard({
                 <h2 className="mobile-section-title">Shift Performance</h2>
                 <span className="text-xs text-muted-foreground">Target {SHIFT_TARGET} each</span>
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-2 text-center">
                 {ALL_SHIFTS.map((shift) => {
                   const total = sumLoads(todayEntries.filter((entry) => entry.shift === shift));
                   const active = isCurrentDate && shift === activeShift;
