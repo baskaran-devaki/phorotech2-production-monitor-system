@@ -1,5 +1,7 @@
 # PPMS upgrade brief
 
+- [ ] Mobile date calendar, historical shift selection, loading/empty states, and boundary/total verification (mobile only)
+
 - [ ] Preserve production history, reports, shifts, and TV Mode while adding new modules
 - [ ] Add email-based user profiles, assigned departments, and Super Admin-controlled permissions
 - [ ] Add maintenance team, downtime workflow, attendance, history, and analytics
