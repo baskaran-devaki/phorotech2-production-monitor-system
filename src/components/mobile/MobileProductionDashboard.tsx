@@ -1,7 +1,12 @@
-import { Link } from "@tanstack/react-router";
+import { Link, getRouteApi, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { format, parseISO } from "date-fns";
 import { useEffect, useMemo, useState } from "react";
 import {
   Activity,
+  CalendarDays,
+  ChevronDown,
+  LoaderCircle,
   BarChart3,
   Check,
   Clipboard,
@@ -20,6 +25,11 @@ import logoUrl from "@/assets/phorotech-logo.jpeg";
 const logoAsset = { url: logoUrl };
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { fetchAllProductionEntries } from "@/lib/production-data";
+import { datesWithProduction, entriesForBusinessDate, hourlyForShift } from "@/lib/mobile-production";
+import { useClock } from "@/hooks/useProduction";
 import { supabase } from "@/integrations/supabase/client";
 import { KeyRound } from "lucide-react";
 import { useProductionMode } from "@/hooks/useProductionMode";
@@ -29,6 +39,7 @@ import {
   SHIFTS,
   SHIFT_TARGET,
   currentShift,
+  businessDate as getBusinessDate,
   sumLoads,
   type ProductionEntry,
 } from "@/lib/production";
@@ -38,6 +49,7 @@ type MobileView = "dashboard" | "reports" | "analytics" | "settings";
 
 interface MobileProductionDashboardProps {
   entries: ProductionEntry[];
+  loading: boolean;
   businessDate: string;
   online: boolean;
   isSignedIn: boolean;
@@ -55,6 +67,7 @@ const NAV_ITEMS: Array<{ key: MobileView; label: string; icon: typeof Gauge }> =
 
 export function MobileProductionDashboard({
   entries,
+  loading,
   businessDate,
   online,
   isSignedIn,
@@ -65,21 +78,35 @@ export function MobileProductionDashboard({
   const [view, setView] = useState<MobileView>("dashboard");
   const [tvUrl, setTvUrl] = useState("/tv");
   const [copied, setCopied] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const navigate = useNavigate({ from: "/" });
+  const { mobileDate, mobileShift } = getRouteApi("/").useSearch();
+  const now = useClock();
+  const currentDate = getBusinessDate(now);
+  const selectedDate = mobileDate ?? currentDate;
+  const activeShift = currentShift(now);
+  const selectedShift = mobileShift ?? (selectedDate === currentDate ? activeShift : 1);
+  const isCurrentDate = selectedDate === currentDate;
+  const historical = useQuery({
+    queryKey: ["mobile-production-day", selectedDate],
+    queryFn: () => fetchAllProductionEntries({ from: selectedDate, to: selectedDate }),
+    enabled: !isCurrentDate,
+  });
+  const dayLoading = isCurrentDate ? loading : historical.isPending;
+  const dayError = !isCurrentDate && historical.isError;
+  const productionDates = useMemo(() => datesWithProduction(entries), [entries]);
   const { mode } = useProductionMode();
 
   useEffect(() => setTvUrl(`${window.location.origin}/tv`), []);
 
   const todayEntries = useMemo(
-    () => entries.filter((entry) => entry.entry_date === businessDate),
-    [businessDate, entries],
+    () => entriesForBusinessDate(isCurrentDate ? entries : historical.data ?? [], selectedDate),
+    [selectedDate, isCurrentDate, historical.data, entries],
   );
   const todayTotal = useMemo(() => sumLoads(todayEntries), [todayEntries]);
   const achievement = DAILY_TARGET > 0 ? (todayTotal / DAILY_TARGET) * 100 : 0;
-  const activeShift = currentShift();
-  const hourly = SHIFTS[activeShift].slots.map((slot, index) => ({
-    slot,
-    loads: todayEntries.find((entry) => entry.shift === activeShift && entry.slot_index === index)?.load_count ?? 0,
-  }));
+  const hourly = hourlyForShift(todayEntries, selectedDate, selectedShift);
+  const shiftHasProduction = todayEntries.some((entry) => entry.shift === selectedShift && entry.load_count > 0);
 
   async function copyTvLink() {
     try {
@@ -121,14 +148,43 @@ export function MobileProductionDashboard({
         {view === "dashboard" && (
           <>
             <section className="neon-card text-center">
-              <p className="text-base font-black uppercase tracking-wide text-mobile-accent" style={{ textShadow: "0 0 12px var(--neon-blue)" }}>Today&apos;s Production</p>
-              <p className="mt-1 text-sm text-muted-foreground">Business date · {businessDate}</p>
-              <p className="neon-text mt-4 text-6xl font-black leading-none tabular-nums">{todayTotal.toLocaleString("en-IN")}</p>
+              <p className="text-base font-black uppercase tracking-wide text-mobile-accent" style={{ textShadow: "0 0 12px var(--neon-blue)" }}>{isCurrentDate ? "Today's Production" : "Daily Production"}</p>
+              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" className="mt-1 h-auto min-h-11 w-full flex-wrap gap-2 text-sm" aria-label="Select business date">
+                    <CalendarDays className="size-4 shrink-0 text-mobile-accent" />
+                    <span>Business date · {selectedDate}</span><ChevronDown className="size-4 shrink-0" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="center" className="mobile-production-calendar w-auto max-w-[calc(100vw-2rem)] p-0">
+                  <Calendar mode="single" selected={parseISO(selectedDate)} defaultMonth={parseISO(selectedDate)}
+                    className="pointer-events-auto" disabled={{ after: parseISO(currentDate) }}
+                    modifiers={loading ? {} : {
+                      production: (date) => productionDates.has(format(date, "yyyy-MM-dd")),
+                      empty: (date) => format(date, "yyyy-MM-dd") <= currentDate && !productionDates.has(format(date, "yyyy-MM-dd")),
+                    }}
+                    modifiersClassNames={{ production: "production-calendar-day", empty: "empty-calendar-day" }}
+                    onSelect={(date) => {
+                      if (!date) return;
+                      const value = format(date, "yyyy-MM-dd");
+                      void navigate({ search: (previous) => ({ ...previous, mobileDate: value === currentDate ? undefined : value, mobileShift: undefined }) });
+                      setCalendarOpen(false);
+                    }} />
+                  <div className="flex flex-wrap justify-center gap-3 border-t border-border px-3 py-3 text-xs">
+                    {loading ? <span role="status">Loading production dates…</span> : <><span className="text-success">● Production</span><span className="text-muted-foreground">● No production</span></>}
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <p className="text-xs font-semibold text-mobile-accent">{isCurrentDate ? "Current business day" : "Historical business day"} · 06:00 AM – 06:00 AM</p>
+              {dayError ? <div role="alert" className="mt-4 text-sm text-danger">Unable to load production.<Button variant="ghost" onClick={() => void historical.refetch()}>Retry</Button></div> : <>
+              <p className="neon-text mt-4 flex min-h-16 items-center justify-center text-6xl font-black leading-none tabular-nums" aria-live="polite">{dayLoading ? <LoaderCircle aria-label="Loading production" className="size-10 animate-spin motion-reduce:animate-none" /> : todayTotal.toLocaleString("en-IN")}</p>
               <p className="mt-2 text-sm font-extrabold uppercase tracking-wider" style={{ color: "var(--neon-green)", textShadow: "0 0 10px var(--neon-green)" }}>Actual Loads</p>
+              {!dayLoading && todayTotal === 0 && <p role="status" className="mt-3 text-sm text-muted-foreground">No production for {selectedDate}</p>}
               <div className="mt-4 grid grid-cols-2 gap-2 text-left">
                 <NeonMetric label="Target" value={DAILY_TARGET.toString()} color="var(--neon-orange)" />
-                <NeonMetric label="Achievement" value={`${achievement.toFixed(1)}%`} color={achievement >= 90 ? "var(--neon-green)" : achievement >= 60 ? "var(--neon-orange)" : "var(--neon-red)"} />
+                <NeonMetric label="Achievement" value={dayLoading ? "—" : `${achievement.toFixed(1)}%`} color={achievement >= 90 ? "var(--neon-green)" : achievement >= 60 ? "var(--neon-orange)" : "var(--neon-red)"} />
               </div>
+              </>}
             </section>
 
             <section>
@@ -139,30 +195,35 @@ export function MobileProductionDashboard({
               <div className="grid grid-cols-3 gap-2">
                 {ALL_SHIFTS.map((shift) => {
                   const total = sumLoads(todayEntries.filter((entry) => entry.shift === shift));
-                  const active = shift === activeShift;
-                  const color = shift === 1 ? "var(--neon-blue)" : shift === 2 ? "var(--neon-orange)" : "var(--neon-green)";
+                  const active = isCurrentDate && shift === activeShift;
                   return (
-                    <article key={shift} className="neon-card p-3" style={{ borderColor: `color-mix(in oklab, ${color} 55%, transparent)`, boxShadow: active ? `0 0 18px -4px ${color}` : undefined }}>
-                      <div className="flex items-center justify-between gap-1">
-                        <span className="text-xs font-extrabold" style={{ color }}>Shift {shift === 1 ? "I" : shift === 2 ? "II" : "III"}</span>
-                        {active && <span className="size-2 rounded-full" style={{ background: "var(--neon-green)", boxShadow: "0 0 8px var(--neon-green)" }} />}
-                      </div>
-                      <p className="mt-3 text-2xl font-black tabular-nums" style={{ textShadow: `0 0 10px ${color}` }}>{total}</p>
-                      <p className="text-[10px] text-muted-foreground">of {SHIFT_TARGET}</p>
-                    </article>
+                    <Button key={shift} variant="ghost" aria-label={`View Shift ${shift} hourly production`} aria-pressed={selectedShift === shift}
+                      onClick={() => void navigate({ search: (previous) => ({ ...previous, mobileShift: shift }) })}
+                      className={`mobile-shift-selector mobile-shift-${shift}`}>
+                      <span className="flex w-full items-center justify-between gap-1">
+                        <span className="text-xs font-extrabold">Shift {shift === 1 ? "I" : shift === 2 ? "II" : "III"}</span>
+                        {active && <span className="size-2 rounded-full bg-success" aria-label="Live shift" />}
+                      </span>
+                      <span className="mt-2 text-2xl font-black tabular-nums">{dayLoading || dayError ? "—" : total}</span>
+                      <span className="text-[10px] text-muted-foreground">of {SHIFT_TARGET}</span>
+                    </Button>
                   );
                 })}
               </div>
             </section>
 
-            <section className="neon-card">
+            <section className="neon-card" aria-label="Selected shift hourly production" aria-busy={dayLoading}>
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <h2 className="mobile-section-title">Hourly Production</h2>
-                  <p className="text-xs text-muted-foreground">{SHIFTS[activeShift].label} · {SHIFTS[activeShift].range}</p>
+                  <p className="text-xs text-muted-foreground">{SHIFTS[selectedShift].label} · {SHIFTS[selectedShift].range}</p>
+                  <p className="mt-1 text-xs font-semibold text-mobile-accent">{selectedDate}{isCurrentDate && selectedShift === activeShift ? " · Live" : ""}</p>
+                  {selectedShift === 3 && <p className="mt-1 text-xs text-muted-foreground">Ends at 06:00 AM the following day</p>}
                 </div>
                 <Activity className="size-5 text-mobile-accent" style={{ filter: "drop-shadow(0 0 6px var(--neon-blue))" }} />
               </div>
+              {dayLoading ? <p role="status" className="py-6 text-center text-sm text-muted-foreground">Loading hourly production…</p> : dayError ? <p className="py-4 text-sm text-danger">Hourly production unavailable</p> : <>
+              {!shiftHasProduction && <p className="mt-3 text-sm text-muted-foreground">No production in this shift for {selectedDate}</p>}
               <div className="mt-3 divide-y divide-border">
                 {hourly.map(({ slot, loads }) => (
                   <div key={slot} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-2.5">
@@ -171,6 +232,8 @@ export function MobileProductionDashboard({
                   </div>
                 ))}
               </div>
+              <div className="mt-2 flex justify-between border-t border-border pt-3 text-sm font-bold"><span>Shift total</span><span className="tabular-nums text-success">{sumLoads(todayEntries.filter((entry) => entry.shift === selectedShift))}</span></div>
+              </>}
             </section>
 
             <section className="grid grid-cols-2 gap-2">

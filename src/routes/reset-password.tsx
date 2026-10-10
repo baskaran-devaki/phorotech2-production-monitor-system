@@ -8,6 +8,11 @@ export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
       { title: "Reset Password · Phorotech" },
+      { name: "description", content: "Reset your Phorotech PPMS account password." },
+      { property: "og:title", content: "Reset Password · Phorotech" },
+      { property: "og:description", content: "Reset your Phorotech PPMS account password." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),

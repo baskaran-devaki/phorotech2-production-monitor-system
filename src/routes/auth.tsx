@@ -10,6 +10,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Admin Login · Phorotech ED Plant" },
+      { property: "og:title", content: "Admin Login · Phorotech ED Plant" },
+      { property: "og:description", content: "Secure sign-in for Phorotech PPMS." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "description", content: "Secure admin sign-in for Phorotech Surfin ED Plant production dashboard." },
       { name: "robots", content: "noindex" },
     ],
