@@ -191,7 +191,7 @@ export function MobileProductionDashboard({
                 <h2 className="mobile-section-title">Shift Performance</h2>
                 <span className="text-xs text-muted-foreground">Target {SHIFT_TARGET} each</span>
               </div>
-              <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="grid grid-cols-3 gap-2">
                 {ALL_SHIFTS.map((shift) => {
                   const total = sumLoads(todayEntries.filter((entry) => entry.shift === shift));
                   const active = isCurrentDate && shift === activeShift;
