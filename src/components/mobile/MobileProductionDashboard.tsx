@@ -161,7 +161,7 @@ export function MobileProductionDashboard({
                     className="pointer-events-auto" disabled={{ after: parseISO(currentDate) }}
                     modifiers={loading ? {} : {
                       production: (date) => productionDates.has(format(date, "dd-MM-yyyy")),
-                      empty: (date) => format(date, "yyyy-MM-dd") <= currentDate && !productionDates.has(format(date, "dd-MM-yyyy")),
+                      empty: (date) => format(date, "dd-MM-yyyy") <= currentDate && !productionDates.has(format(date, "dd-MM-yyyy")),
                     }}
                     modifiersClassNames={{ production: "production-calendar-day", empty: "empty-calendar-day" }}
                     onSelect={(date) => {
