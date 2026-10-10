@@ -420,3 +420,31 @@
 @media (prefers-reduced-motion: reduce) {
   .splash-logo-wrap, .splash-bar span { animation: none !important; }
 }
+
+@layer components {
+  .mobile-shift-selector {
+    --shift-accent: var(--neon-blue);
+    height: 7.5rem;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    white-space: normal;
+    border: 1px solid color-mix(in oklab, var(--shift-accent) 55%, transparent);
+    color: var(--shift-accent);
+    background: var(--mobile-surface);
+  }
+  .mobile-shift-2 { --shift-accent: var(--neon-orange); }
+  .mobile-shift-3 { --shift-accent: var(--neon-green); }
+  .mobile-shift-selector[aria-pressed="true"] {
+    background: color-mix(in oklab, var(--shift-accent) 12%, var(--mobile-surface));
+    box-shadow: 0 0 18px -4px var(--shift-accent);
+    outline: 1px solid var(--shift-accent);
+  }
+  .mobile-production-calendar .production-calendar-day button { color: var(--neon-green); background: color-mix(in oklab, var(--neon-green) 12%, transparent); }
+  .mobile-production-calendar .empty-calendar-day button { color: var(--muted-foreground); background: var(--muted); }
+  .mobile-production-calendar button[data-selected-single="true"] { outline: 2px solid var(--mobile-accent); outline-offset: -2px; font-weight: 800; }
+}
