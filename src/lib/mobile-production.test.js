@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
-import { businessDate, currentShift, sumLoads, type ProductionEntry } from "./production";
+import { businessDate, currentShift, sumLoads } from "./production";
 import { datesWithProduction, entriesForBusinessDate, hourlyForShift } from "./mobile-production";
 
-const entry = (date: string, shift: 1 | 2 | 3, index: number, loads: number): ProductionEntry => ({
+const entry = (date, shift, index, loads) => ({
   id: `${date}-${shift}-${index}`, entry_date: date, shift, slot_index: index,
   time_slot: "", load_count: loads, remarks: null, created_at: "", updated_at: "",
 });
