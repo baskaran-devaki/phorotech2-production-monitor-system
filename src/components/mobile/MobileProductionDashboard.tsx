@@ -175,7 +175,6 @@ export function MobileProductionDashboard({
                   </div>
                 </PopoverContent>
               </Popover>
-              <p className="text-xs font-semibold text-mobile-accent">{isCurrentDate ? "Current business day" : "Historical business day"} · 06:00 AM – 06:00 AM</p>
               {dayError ? <div role="alert" className="mt-4 text-sm text-danger">Unable to load production.<Button variant="ghost" onClick={() => void historical.refetch()}>Retry</Button></div> : <>
               <p className="neon-text mt-4 flex min-h-16 items-center justify-center text-6xl font-black leading-none tabular-nums" aria-live="polite">{dayLoading ? <LoaderCircle aria-label="Loading production" className="size-10 animate-spin motion-reduce:animate-none" /> : todayTotal.toLocaleString("en-IN")}</p>
               <p className="mt-2 text-sm font-extrabold uppercase tracking-wider" style={{ color: "var(--neon-green)", textShadow: "0 0 10px var(--neon-green)" }}>Actual Loads</p>
